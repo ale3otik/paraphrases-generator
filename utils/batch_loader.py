@@ -1,7 +1,7 @@
 import collections
 import os
 import re
-import torch
+import torch as t
 import numpy as np
 import pandas as pd
 
@@ -30,7 +30,6 @@ class BatchLoader:
             Tokenization/string cleaning for all datasets except for SST.
             Original taken from https://github.com/yoonkim/CNN_sentence/blob/master/process_data
         '''
-
         string = re.sub(r"[^가-힣A-Za-z0-9(),!?:;.\'\`]", " ", string)
         string = re.sub(r"\'s", " \'s", string)
         string = re.sub(r"\'ve", " \'ve", string)
@@ -58,7 +57,7 @@ class BatchLoader:
         sentences = [df['question1'].values, df['question2'].values]
         embed = [self.embed_batch(batch) for batch in sentences]
         return embed
-        
+
     # Original taken from https://github.com/facebookresearch/InferSent/blob/master/data.py
     def embed_batch(self, batch):
         batch = [self.clean_str(s) for s in batch]
@@ -69,7 +68,7 @@ class BatchLoader:
             for j in range(len(batch[i])):
                 embed[j, i, :] = self.word_vec[batch[i][j]]
 
-        return torch.from_numpy(embed).float()
+        return t.from_numpy(embed).float()
 
     def get_word_dict(self, sentences):
         # create vocab of words
