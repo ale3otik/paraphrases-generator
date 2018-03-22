@@ -6,18 +6,19 @@ import numpy as np
 import pandas as pd
 
 class BatchLoader:
-    def __init__(self, sentences=None, path='../../'):
+    def __init__(self, vocab_size, sentences=None, path='../../'):
         '''
             Build vocab for sentences or for data files in path if None. 
         '''
+        self.vocab_size = vocab_size
+        self.word_to_idx = {}
+        self.idx_to_word = {}
+        self.word_vec = {}
+
+        self.unk_label = '<unk>'
         self.data_files = [path + 'data/quora/train.txt',
                            path + 'data/quora/test.txt']
         self.glove_path = [path + 'data/glove.840B.300d.txt']
-
-        self.blind_symbol = ''
-        self.pad_token = '_'
-        self.go_token = '>'
-        self.end_token = '|'
 
         if sentences is None:
             self.data = [pd.read_csv(f)[['question1', 'question2']] for f in data_files[0]]
@@ -60,13 +61,13 @@ class BatchLoader:
 
     # Original taken from https://github.com/facebookresearch/InferSent/blob/master/data.py
     def embed_batch(self, batch):
-        batch = [self.clean_str(s) for s in batch]
-        lengths = np.max([len(x) for x in batch])
-        embed = np.zeros((max_len, len(batch), 300))
+        batch = [self.clean_str(s).split('') + ['</s>'] for s in batch]
+        max_len = np.max([len(x) for x in batch])
+        embed = np.zeros((len(batch), max_len, 300))
 
         for i in range(len(batch)):
             for j in range(len(batch[i])):
-                embed[j, i, :] = self.word_vec[batch[i][j]]
+                embed[i, j, :] = self.word_vec[batch[i][j]]
 
         return t.from_numpy(embed).float()
 
@@ -81,11 +82,28 @@ class BatchLoader:
         word_dict['</s>'] = ''
         word_dict['<p>'] = ''
         return word_dict
+    
+    def build_most_common_vocab(self, sentences):
+        word_counts = collections.Counter(sentences)
+        self.idx_to_word = [x[0] for x in word_counts.most_common(self.vocab_size - 2)] \
+        + ['</s>'] + [self.unk_label]
+        self.word_to_idx = {self.idx_to_word[i] : i for i in self.vocab_size}
+    
+    def sample_word_from_distribution(self, distribution):
+        assert len(distribution) == self.vocab_size
+        ix = np.random.choice(range(self.vocab_size), p=distribution.ravel())
+        return self.idx_to_word[ix]
+    
+    def get_word_by_idx(self, idx):
+        return self.idx_to_word[idx]
 
+    def get_idx_by_word(self, w):
+        if w in self.word_to_idx.keys():
+            return self.word_to_idx[w]
+        return self.word_to_idx[self.unk_label]
 
     def build_glove(self, word_dict):
         # create word_vec with glove vectors
-        self.word_vec = {}
         with open(self.glove_path) as f:
             for line in f:
                 word, vec = line.split(' ', 1)
@@ -95,6 +113,7 @@ class BatchLoader:
                     len(self.word_vec), len(word_dict)))
 
     def get_sentences_from_data(self):
+        sentences = []
         for df in self.data:
             sentences += list(df['question1'].values) + list(df['question2'].values)
         return sentences
@@ -104,5 +123,7 @@ class BatchLoader:
             sentences = self.get_sentences_from_data()
         sentences = [self.clean_str(s) for s in sentences]
         word_dict = self.get_word_dict(sentences)
-        build_glove(self, word_dict)
+        
+        self.build_most_common_vocab(sentences)
+        self.build_glove(word_dict)
         print('Vocab size : {0}'.format(len(self.word_vec)))
