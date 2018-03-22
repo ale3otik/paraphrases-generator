@@ -109,7 +109,7 @@ class BatchLoader:
     def build_most_common_vocab(self, sentences):
         word_counts = collections.Counter(sentences)
         self.idx_to_word = [x[0] for x in word_counts.most_common(self.vocab_size - 2)] \
-        + ['</s>'] + [self.unk_label]
+        + [self.unk_label] + ['</s>']
         self.word_to_idx = {self.idx_to_word[i] : i for i in self.vocab_size}
     
     def sample_word_from_distribution(self, distribution):
@@ -161,6 +161,6 @@ class BatchLoader:
         self.max_seq_len = np.max([len(s) for s in sentences]) + 1
         word_dict = self.get_word_dict(sentences)
         
-        self.build_most_common_vocab(sentences)
+        self.build_most_common_vocab([s.split() for s in sentences])
         self.build_glove(word_dict)
         print('Vocab size : {0}'.format(len(self.word_vec)))
