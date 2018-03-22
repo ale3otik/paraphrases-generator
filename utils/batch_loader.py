@@ -16,6 +16,9 @@ class BatchLoader:
         self.word_vec = {}
 
         self.unk_label = '<unk>'
+        self.end_label = '</s>'
+        self.go_label = '<s>'
+
         self.data_files = [path + 'data/quora/train.txt',
                            path + 'data/quora/test.txt']
         self.glove_path = [path + 'data/glove.840B.300d.txt']
@@ -49,6 +52,20 @@ class BatchLoader:
         string = re.sub(r"\s{2,}", " ", string)
         return string.strip()
 
+    def get_encoder_input(self, sentences):
+        return [self.embed_batch([s + [self.end_label] for s in q]) for q in sentences]
+    
+    def get_decoder_input(self, sentences): 
+        enc_inp = self.embed_batch([s + [self.end_label] for s in sentences[0]]) 
+        dec_inp = self.embed_batch([[self.go_label] + s + [self.end_label] for s in sentences[1]]) 
+        return [enc_inp, dec_inp]
+    
+    def get_target(self, sentences):
+        sentences = sentences[1]
+        target_idx = [[get_idx_by_word(w) for w in s] for s in sentences]
+        # target_onehot = self.get_onehot_wocab(target_idx)
+        return target_idx
+
     def next_batch(self, batch_size, type):
         if type == 'train':
             file_id = 0
@@ -56,12 +73,16 @@ class BatchLoader:
             file_id = 1
         df = self.data[file_id].sample(batch_size ,replace=False)
         sentences = [df['question1'].values, df['question2'].values]
-        embed = [self.embed_batch(batch) for batch in sentences]
-        return embed
+        sentences = [[self.clean_str(s).split() for s in q] for q in sentences]
+        
+        ecoder_input = self.get_encoder_input(sentences)
+        decoder_input = self.get_decoder_input(sentences)
+        target = self.get_target(sentences)
+
+        return [encoder_input, decoder_input, target]
 
     # Original taken from https://github.com/facebookresearch/InferSent/blob/master/data.py
     def embed_batch(self, batch):
-        batch = [self.clean_str(s).split('') + ['</s>'] for s in batch]
         max_len = np.max([len(x) for x in batch])
         embed = np.zeros((len(batch), max_len, 300))
 
@@ -94,6 +115,18 @@ class BatchLoader:
         ix = np.random.choice(range(self.vocab_size), p=distribution.ravel())
         return self.idx_to_word[ix]
     
+    def get_onehot_vocab(self, ids):
+        batch_size = len(ids)
+        max_seq_len = np.max([len(x) for x in ids])
+        res = np.zeros((batch_size, max_seq_len, self.vocab_size),dtype=np.int32)
+        for i in range(batch_size):
+            for j in range(max_seq_len):
+                if j < len(ids[i]):
+                    res[i][j][ids[i][j]] = 1 
+                else :
+                    res[i][j][self.vocab_size - 1] = 1 # end symb
+        return res
+
     def get_word_by_idx(self, idx):
         return self.idx_to_word[idx]
 
