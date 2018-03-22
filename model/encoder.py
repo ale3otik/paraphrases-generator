@@ -2,8 +2,7 @@ import torch as t
 import torch.nn as nn
 import torch.nn.functional as F
 
-from highway import Highway
-from utils.functional import parameters_allocation_check
+from .highway import Highway
 
 
 class Encoder(nn.Module):
@@ -33,7 +32,7 @@ class Encoder(nn.Module):
         """
 
         # (num_layers * num_directions, batch, hidden_size)        
-        h_state, c_state = None, None
+        state = None
         for i, input in enumerate([input_source , input_target]):
             [batch_size, seq_len, embed_size] = input.size()
 
@@ -41,13 +40,14 @@ class Encoder(nn.Module):
             input = self.hw1(input)
             input = input.view(batch_size, seq_len, embed_size)
 
-            _, (h_state, c_state) = self.rnns[i](input, (h_state, c_state))
-        
+            _, state = self.rnns[i](input, state)
+
+        [h_state, c_state] = state
         h_state = h_state.view(self.params.encoder_num_layers, 2, batch_size, self.params.encoder_rnn_size)[-1]
         c_state = c_state.view(self.params.encoder_num_layers, 2, batch_size, self.params.encoder_rnn_size)[-1]
-        h_state = h_state.permute(1,0,2).view(batch_size, -1)
-        c_state = c_state.permute(1,0,2).view(batch_size, -1)
+        h_state = h_state.permute(1,0,2).contiguous().view(batch_size, -1)
+        c_state = c_state.permute(1,0,2).contiguous().view(batch_size, -1)
         final_state = t.cat([h_state, c_state], 1)
 
-        mu, logvar = context_to_mu(final_state), context_to_logvar(final_state)
+        mu, logvar = self.context_to_mu(final_state), self.context_to_logvar(final_state)
         return mu, logvar

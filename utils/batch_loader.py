@@ -2,11 +2,12 @@ import collections
 import os
 import re
 import torch as t
+from torch.autograd import Variable
 import numpy as np
 import pandas as pd
 
 class BatchLoader:
-    def __init__(self, vocab_size=10000, sentences=None, path='../../'):
+    def __init__(self, vocab_size=20000, sentences=None, path=''):
         '''
             Build vocab for sentences or for data files in path if None. 
         '''
@@ -20,12 +21,12 @@ class BatchLoader:
         self.end_label = '</s>'
         self.go_label = '<s>'
 
-        self.data_files = [path + 'data/quora/train.txt',
-                           path + 'data/quora/test.txt']
-        self.glove_path = [path + 'data/glove.840B.300d.txt']
+        self.data_files = [ path + 'data/quora/train.csv',
+                           path + 'data/quora/test.csv']
+        self.glove_path = path + 'data/glove.840B.300d.txt'
 
         if sentences is None:
-            self.data = [pd.read_csv(f)[['question1', 'question2']] for f in data_files[0]]
+            self.data = [pd.read_csv(f)[['question1', 'question2']] for f in self.data_files]
 
         self.build_vocab(sentences)
 
@@ -54,19 +55,22 @@ class BatchLoader:
         return string.strip()
 
     def get_encoder_input(self, sentences):
-        return [self.embed_batch([s + [self.end_label] for s in q]) for q in sentences]
+        return [Variable(t.from_numpy(
+            self.embed_batch([s + [self.end_label] for s in q]))).float() for q in sentences]
     
     def get_decoder_input(self, sentences): 
         enc_inp = self.embed_batch([s + [self.end_label] for s in sentences[0]]) 
         dec_inp = self.embed_batch([[self.go_label] + s + [self.end_label] for s in sentences[1]]) 
-        return [enc_inp, dec_inp]
+        return [Variable(t.from_numpy(enc_inp)).float(), Variable(t.from_numpy(dec_inp)).float()]
     
     def get_target(self, sentences):
         sentences = sentences[1]
-        target_idx = [[get_idx_by_word(w) for w in s] 
-                        + [get_idx_by_word(self.end_label)] for s in sentences]
+        max_seq_len = np.max([len(s) for s in sentences]) + 1
+        target_idx = [[self.get_idx_by_word(w) for w in s] 
+                        + [self.get_idx_by_word(self.end_label)] * (max_seq_len - len(s))
+                        for s in sentences] 
         # target_onehot = self.get_onehot_wocab(target_idx)
-        return target_idx
+        return Variable(t.from_numpy(np.array(target_idx, dtype=np.int64))).long()
 
     def next_batch(self, batch_size, type):
         if type == 'train':
@@ -77,11 +81,13 @@ class BatchLoader:
         sentences = [df['question1'].values, df['question2'].values]
         sentences = [[self.clean_str(s).split() for s in q] for q in sentences]
         
-        ecoder_input = self.get_encoder_input(sentences)
-        decoder_input = self.get_decoder_input(sentences)
+        encoder_input_source, encoder_input_target  = self.get_encoder_input(sentences)
+        decoder_input_source, decoder_input_target = self.get_decoder_input(sentences)
         target = self.get_target(sentences)
 
-        return [encoder_input, decoder_input, target]
+        return [encoder_input_source, encoder_input_target, 
+                decoder_input_source, decoder_input_target,
+                target]
 
     # Original taken from https://github.com/facebookresearch/InferSent/blob/master/data.py
     def embed_batch(self, batch):
@@ -90,9 +96,14 @@ class BatchLoader:
 
         for i in range(len(batch)):
             for j in range(len(batch[i])):
-                embed[i, j, :] = self.word_vec[batch[i][j]]
+                if batch[i][j] == self.go_label or batch[i][j] == self.end_label:
+                    continue
+                if batch[i][j] in self.word_vec.keys(): 
+                    embed[i, j, :] = self.word_vec[batch[i][j]]
+                else:
+                    embed[i, j, :] = self.word_vec['null']
 
-        return t.from_numpy(embed).float()
+        return embed
 
     def get_word_dict(self, sentences):
         # create vocab of words
@@ -110,7 +121,7 @@ class BatchLoader:
         word_counts = collections.Counter(sentences)
         self.idx_to_word = [x[0] for x in word_counts.most_common(self.vocab_size - 2)] \
         + [self.unk_label] + ['</s>']
-        self.word_to_idx = {self.idx_to_word[i] : i for i in self.vocab_size}
+        self.word_to_idx = {self.idx_to_word[i] : i for i in range(self.vocab_size)}
     
     def sample_word_from_distribution(self, distribution):
         assert len(distribution) == self.vocab_size
@@ -160,7 +171,7 @@ class BatchLoader:
 
         self.max_seq_len = np.max([len(s) for s in sentences]) + 1
         word_dict = self.get_word_dict(sentences)
-        
-        self.build_most_common_vocab([s.split() for s in sentences])
+        text = ' '.join(sentences).split()
+        self.build_most_common_vocab(text)
         self.build_glove(word_dict)
         print('Vocab size : {0}'.format(len(self.word_vec)))

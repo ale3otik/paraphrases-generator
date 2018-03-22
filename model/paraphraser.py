@@ -34,7 +34,7 @@ class Paraphraser(nn.Module):
         if z is None:
             ''' Get context from encoder and sample z ~ N(mu, std)
             '''
-            [batch_size, _] = encoder_input[0].size()
+            [batch_size, _, _] = encoder_input[0].size()
 
             mu, logvar = self.encoder(encoder_input[0], encoder_input[1])
             std = t.exp(0.5 * logvar)
@@ -57,13 +57,16 @@ class Paraphraser(nn.Module):
     def trainer(self, optimizer, batch_loader):
         def train(i, batch_size, use_cuda, dropout):
             input = batch_loader.next_batch(batch_size, 'train')
-            input = [Variable(t.from_numpy(var)) for var in input]
-            input = [var.long() for var in input]
             input = [var.cuda() if use_cuda else var for var in input]
 
-            [encoder_input, decoder_input, target] = input
+            [encoder_input_source, 
+             encoder_input_target, 
+             decoder_input_source, 
+             decoder_input_target, target] = input
 
-            logits, _, kld = self(dropout, encoder_input, decoder_input, z=None)
+            logits, _, kld = self(dropout, 
+                    (encoder_input_source, encoder_input_target),
+                    (decoder_input_source, decoder_input_target), z=None)
 
             logits = logits.view(-1, self.params.vocab_size)
             target = target.view(-1)
@@ -83,13 +86,15 @@ class Paraphraser(nn.Module):
     def validater(self, batch_loader):
         def validate(batch_size, use_cuda):
             input = batch_loader.next_batch(batch_size, 'test')
-            input = [Variable(t.from_numpy(var)) for var in input]
-            input = [var.long() for var in input]
             input = [var.cuda() if use_cuda else var for var in input]
 
-            [encoder_input, decoder_input, target] = input
+            [encoder_input_source, 
+             encoder_input_target, 
+             decoder_input_source, 
+             decoder_input_target, target] = input
 
-            logits, _, kld = self(0., encoder_input, decoder_input, z=None)
+            logits, _, kld = self(0., (encoder_input_source, encoder_input_target),
+                                  (decoder_input_source, decoder_input_target), z=None)
 
             logits = logits.view(-1, self.params.vocab_size)
             target = target.view(-1)

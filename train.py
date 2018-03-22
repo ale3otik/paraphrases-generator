@@ -16,7 +16,7 @@ if __name__ == "__main__":
                         help='num iterations (default: 60000)')
     parser.add_argument('--batch-size', type=int, default=32, metavar='BS',
                         help='batch size (default: 32)')
-    parser.add_argument('--use-cuda', type=bool, default=True, metavar='CUDA',
+    parser.add_argument('--use-cuda', type=bool, default=False, metavar='CUDA',
                         help='use cuda (default: True)')
     parser.add_argument('--learning-rate', type=float, default=0.00005, metavar='LR',
                         help='learning rate (default: 0.00005)')
@@ -28,7 +28,7 @@ if __name__ == "__main__":
                         help='name of model to save (default: '')')
     args = parser.parse_args()
 
-    batch_loader = BatchLoader('')
+    batch_loader = BatchLoader()
     parameters = Parameters(batch_loader.max_seq_len,
                             batch_loader.vocab_size)
 

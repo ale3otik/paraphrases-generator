@@ -2,8 +2,6 @@ import torch as t
 import torch.nn as nn
 import torch.nn.functional as F
 
-from utils.functional import parameters_allocation_check
-
 
 class Decoder(nn.Module):
     def __init__(self, params):
@@ -22,7 +20,7 @@ class Decoder(nn.Module):
                                        num_layers=self.params.decoder_num_layers,
                                        batch_first=True)
 
-        self.fc = nn.Linear(self.params.decoder_rnn_size, self.params.word_vocab_size)
+        self.fc = nn.Linear(self.params.decoder_rnn_size, self.params.vocab_size)
 
     def build_initial_state(self, input):
         [batch_size, seq_len, embed_size] = input.size()
@@ -44,13 +42,13 @@ class Decoder(nn.Module):
         :param initial_state: initial state of decoder rnn
 
         :return: unnormalized logits of sentense words distribution probabilities
-                    with shape of [batch_size, seq_len, word_vocab_size]
+                    with shape of [batch_size, seq_len, vocab_size]
                  final rnn state with shape of [num_layers, batch_size, decoder_rnn_size]
         """
         
         if initial_state is None:
             # build initial context with source input.
-            assert encoder_input not is None
+            assert not encoder_input is None
             initial_state = self.build_initial_state(encoder_input)
 
         [batch_size, seq_len, _] = decoder_input.size()
@@ -67,6 +65,6 @@ class Decoder(nn.Module):
 
         rnn_out = rnn_out.contiguous().view(-1, self.params.decoder_rnn_size)
         result = self.fc(rnn_out)
-        result = result.view(batch_size, seq_len, self.params.word_vocab_size)
+        result = result.view(batch_size, seq_len, self.params.vocab_size)
 
         return result, final_state
