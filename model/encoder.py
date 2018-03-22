@@ -2,16 +2,13 @@ import torch as t
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .highway import Highway
-
 
 class Encoder(nn.Module):
-    def __init__(self, params):
+    def __init__(self, params, highway):
         super(Encoder, self).__init__()
 
         self.params = params
-
-        self.hw1 = Highway(self.params.word_embed_size, 2, F.relu)
+        self.hw1 = highway
         
         # encoding source and target
         self.rnns = nn.ModuleList([nn.LSTM(input_size=self.params.word_embed_size,
@@ -20,8 +17,8 @@ class Encoder(nn.Module):
                                        batch_first=True,
                                        bidirectional=True) for i in range(2)])
 
-        self.context_to_mu = nn.Linear(self.params.encoder_rnn_size * 2, self.params.latent_variable_size)
-        self.context_to_logvar = nn.Linear(self.params.encoder_rnn_size * 2, self.params.latent_variable_size)
+        self.context_to_mu = nn.Linear(self.params.encoder_rnn_size * 4, self.params.latent_variable_size)
+        self.context_to_logvar = nn.Linear(self.params.encoder_rnn_size * 4, self.params.latent_variable_size)
 
     def forward(self, input_source, input_target):
         """

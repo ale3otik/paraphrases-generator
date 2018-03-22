@@ -7,13 +7,15 @@ from torch.autograd import Variable
 
 from .decoder import Decoder
 from .encoder import Encoder
+from .highway import Highway
 
 class Paraphraser(nn.Module):
     def __init__(self, params):
         super(Paraphraser, self).__init__()
         self.params = params
-        self.encoder = Encoder(self.params)
-        self.decoder = Decoder(self.params)
+        self.highway = Highway(self.params.word_embed_size, 2, F.relu)
+        self.encoder = Encoder(self.params, self.highway)
+        self.decoder = Decoder(self.params, self.highway)
 
     def forward(self, drop_prob, encoder_input=None, decoder_input=None, 
         z=None, initial_state=None, use_cuda=True):
@@ -48,7 +50,8 @@ class Paraphraser(nn.Module):
         else:
             kld = None
 
-        out, final_state = self.decoder(decoder_input, z, drop_prob, initial_state)
+        out, final_state = self.decoder(decoder_input[0], decoder_input[1],
+                                        z, drop_prob, initial_state)
         return out, final_state, kld
 
     def learnable_parameters(self):
@@ -66,8 +69,11 @@ class Paraphraser(nn.Module):
 
             logits, _, kld = self(dropout, 
                     (encoder_input_source, encoder_input_target),
-                    (decoder_input_source, decoder_input_target), z=None)
+                    (decoder_input_source, decoder_input_target), 
+                    z=None, use_cuda=use_cuda)
 
+            print(logits.size())
+            print(target.size())
             logits = logits.view(-1, self.params.vocab_size)
             target = target.view(-1)
             cross_entropy = F.cross_entropy(logits, target)
@@ -94,7 +100,8 @@ class Paraphraser(nn.Module):
              decoder_input_target, target] = input
 
             logits, _, kld = self(0., (encoder_input_source, encoder_input_target),
-                                  (decoder_input_source, decoder_input_target), z=None)
+                                    (decoder_input_source, decoder_input_target), 
+                                    z=None, use_cuda=use_cuda)
 
             logits = logits.view(-1, self.params.vocab_size)
             target = target.view(-1)

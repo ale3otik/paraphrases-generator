@@ -18,5 +18,5 @@ class Parameters:
         self.kld_penalty_weight = 1.0
         self.cross_entropy_penalty_weight = 79.0
 
-    def get_kld_coef(i):
+    def get_kld_coef(self, i):
         return self.kld_penalty_weight * (math.tanh((i - 3500)/1000) + 1)/2.0

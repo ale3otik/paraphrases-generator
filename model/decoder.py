@@ -4,11 +4,11 @@ import torch.nn.functional as F
 
 
 class Decoder(nn.Module):
-    def __init__(self, params):
+    def __init__(self, params, highway):
         super(Decoder, self).__init__()
 
         self.params = params
-        
+        self.hw1 = highway
         self.encoding_rnn = nn.LSTM(input_size=self.params.word_embed_size,
                                        hidden_size=self.params.decoder_rnn_size,
                                        num_layers=self.params.decoder_num_layers,

@@ -60,7 +60,7 @@ class BatchLoader:
     
     def get_decoder_input(self, sentences): 
         enc_inp = self.embed_batch([s + [self.end_label] for s in sentences[0]]) 
-        dec_inp = self.embed_batch([[self.go_label] + s + [self.end_label] for s in sentences[1]]) 
+        dec_inp = self.embed_batch([[self.go_label] + s for s in sentences[1]]) 
         return [Variable(t.from_numpy(enc_inp)).float(), Variable(t.from_numpy(dec_inp)).float()]
     
     def get_target(self, sentences):
