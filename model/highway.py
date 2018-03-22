@@ -33,7 +33,3 @@ class Highway(nn.Module):
             x = gate * nonlinear + (1 - gate) * linear
 
         return x
-
-    # def _add_to_parameters(self, parameters, name):
-    #     for i, parameter in enumerate(parameters):
-    #         self.register_parameter(name='{}-{}'.format(name, i), param=parameter)

@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 
 class BatchLoader:
-    def __init__(self, vocab_size, sentences=None, path='../../'):
+    def __init__(self, vocab_size=10000, sentences=None, path='../../'):
         '''
             Build vocab for sentences or for data files in path if None. 
         '''
@@ -14,6 +14,7 @@ class BatchLoader:
         self.word_to_idx = {}
         self.idx_to_word = {}
         self.word_vec = {}
+        self.max_seq_len = 0
 
         self.unk_label = '<unk>'
         self.end_label = '</s>'
@@ -62,7 +63,8 @@ class BatchLoader:
     
     def get_target(self, sentences):
         sentences = sentences[1]
-        target_idx = [[get_idx_by_word(w) for w in s] for s in sentences]
+        target_idx = [[get_idx_by_word(w) for w in s] 
+                        + [get_idx_by_word(self.end_label)] for s in sentences]
         # target_onehot = self.get_onehot_wocab(target_idx)
         return target_idx
 
@@ -155,6 +157,8 @@ class BatchLoader:
         if sentences is None:
             sentences = self.get_sentences_from_data()
         sentences = [self.clean_str(s) for s in sentences]
+
+        self.max_seq_len = np.max([len(s) for s in sentences]) + 1
         word_dict = self.get_word_dict(sentences)
         
         self.build_most_common_vocab(sentences)
