@@ -9,15 +9,19 @@ class Decoder(nn.Module):
         self.params = params
         self.hw1 = highway
         self.encoding_rnn = nn.LSTM(input_size=self.params.word_embed_size,
-                                       hidden_size=self.params.decoder_rnn_size,
-                                       num_layers=self.params.decoder_num_layers,
+                                       hidden_size=self.params.encoder_rnn_size,
+                                       num_layers=self.params.encoder_num_layers,
                                        batch_first=True,
-                                       bidirectional=False) # TODO: MAKE IT TRUE AFTER DEBUG
+                                       bidirectional=True) 
         
         self.decoding_rnn = nn.LSTM(input_size=self.params.latent_variable_size + self.params.word_embed_size,
                                        hidden_size=self.params.decoder_rnn_size,
                                        num_layers=self.params.decoder_num_layers,
                                        batch_first=True)
+        self.h_to_initial_state = nn.Linear(self.params.encoder_rnn_size * 2, 
+            self.params.decoder_num_layers * self.params.decoder_rnn_size)
+        self.c_to_initial_state = nn.Linear(self.params.encoder_rnn_size * 2, 
+            self.params.decoder_num_layers * self.params.decoder_rnn_size)
 
         self.fc = nn.Linear(self.params.decoder_rnn_size, self.params.vocab_size)
 
@@ -28,8 +32,21 @@ class Decoder(nn.Module):
         input = input.view(batch_size, seq_len, embed_size)
 
         _, cell_state = self.encoding_rnn(input)
+        [h_state, c_state] = cell_state
+        h_state = h_state.view(self.params.encoder_num_layers, 2, batch_size, self.params.encoder_rnn_size)[-1]
+        c_state = c_state.view(self.params.encoder_num_layers, 2, batch_size, self.params.encoder_rnn_size)[-1]
+        
+        # with shapes (batch, 2 * encoder_rnn_size)
+        h_state = h_state.permute(1,0,2).contiguous().view(batch_size, -1)
+        c_state = c_state.permute(1,0,2).contiguous().view(batch_size, -1)
+        
+        # shapes (num_layers, batch, decoder_rnn_size)        
+        h_initial = self.h_to_initial_state(h_state).view(batch_size, 
+            self.params.decoder_num_layers, self.params.decoder_rnn_size).permute(1,0,2).contiguous()
+        c_initial = self.c_to_initial_state(c_state).view(batch_size, 
+            self.params.decoder_num_layers, self.params.decoder_rnn_size).permute(1,0,2).contiguous()
 
-        return cell_state
+        return (h_initial, c_initial)
 
 
     def forward(self, encoder_input, decoder_input, z, drop_prob, initial_state=None):
