@@ -79,8 +79,6 @@ class Paraphraser(nn.Module):
             loss = self.params.cross_entropy_penalty_weight * cross_entropy \
                 +  self.params.get_kld_coef(i) * kld
 
-            # loss = loss.squeeze()
-
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()

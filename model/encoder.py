@@ -43,8 +43,6 @@ class Encoder(nn.Module):
         c_state = c_state.view(self.params.encoder_num_layers, 2, batch_size, self.params.encoder_rnn_size)[-1]
         h_state = h_state.permute(1,0,2).contiguous().view(batch_size, -1)
         c_state = c_state.permute(1,0,2).contiguous().view(batch_size, -1)
-        # print('hstate ', h_state.size())
-        # print('cstate ', c_state.size())
         final_state = t.cat([h_state, c_state], 1)
 
         mu, logvar = self.context_to_mu(final_state), self.context_to_logvar(final_state)
