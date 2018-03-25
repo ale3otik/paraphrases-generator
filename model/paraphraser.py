@@ -72,8 +72,6 @@ class Paraphraser(nn.Module):
                     (decoder_input_source, decoder_input_target), 
                     z=None, use_cuda=use_cuda)
 
-            print(logits.size())
-            print(target.size())
             logits = logits.view(-1, self.params.vocab_size)
             target = target.view(-1)
             cross_entropy = F.cross_entropy(logits, target)
@@ -81,8 +79,7 @@ class Paraphraser(nn.Module):
             loss = self.params.cross_entropy_penalty_weight * cross_entropy \
                 +  self.params.get_kld_coef(i) * kld
 
-            loss = loss.squeeze()
-            print(loss.size())
+            # loss = loss.squeeze()
 
             optimizer.zero_grad()
             loss.backward()

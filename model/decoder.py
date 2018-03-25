@@ -12,7 +12,7 @@ class Decoder(nn.Module):
                                        hidden_size=self.params.decoder_rnn_size,
                                        num_layers=self.params.decoder_num_layers,
                                        batch_first=True,
-                                       bidirectional=True)
+                                       bidirectional=False) # TODO: MAKE IT TRUE AFTER DEBUG
         
         self.decoding_rnn = nn.LSTM(input_size=self.params.latent_variable_size + self.params.word_embed_size,
                                        hidden_size=self.params.decoder_rnn_size,
@@ -52,6 +52,7 @@ class Decoder(nn.Module):
 
         [batch_size, seq_len, _] = decoder_input.size()
 
+        # print(initial_state[0].size())
         '''
             decoder rnn is conditioned on context via additional bias = W_cond * z to every input token
         '''
