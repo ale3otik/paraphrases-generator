@@ -2,7 +2,6 @@ import torch as t
 import torch.nn as nn
 import torch.nn.functional as F
 
-
 class Decoder(nn.Module):
     def __init__(self, params, highway):
         super(Decoder, self).__init__()

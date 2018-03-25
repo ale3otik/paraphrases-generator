@@ -78,8 +78,11 @@ class Paraphraser(nn.Module):
             target = target.view(-1)
             cross_entropy = F.cross_entropy(logits, target)
 
-            loss = (self.params.cross_entropy_penalty_weight * cross_entropy 
-                +  self.params.get_kld_coef(i) * kld)
+            loss = self.params.cross_entropy_penalty_weight * cross_entropy \
+                +  self.params.get_kld_coef(i) * kld
+
+            loss = loss.squeeze()
+            print(loss.size())
 
             optimizer.zero_grad()
             loss.backward()
