@@ -37,9 +37,9 @@ if __name__ == "__main__":
     kld_result = []
 
     if args.use_trained:
-        paraphraser.load_state_dict(t.load('saved_models/trained_Paraphraser_' + args.model_name))
-        ce_result = list(np.load('saved_models/ce_result_{}.npy'.format(args.model_name)))
-        kld_result = list(np.load('saved_models/kld_result_npy_{}.npy'.format(args.model_name)))
+        paraphraser.load_state_dict(t.load('saved_models/trained_paraphraser_' + args.model_name))
+        ce_result = list(np.load('logs/ce_result_{}.npy'.format(args.model_name)))
+        kld_result = list(np.load('logs/kld_result_npy_{}.npy'.format(args.model_name)))
 
     if args.use_cuda:
         paraphraser = paraphraser.cuda()
@@ -67,11 +67,18 @@ if __name__ == "__main__":
             print('------------------------------')
 
         # validation
-        if iteration % 300 == 0:
-            cross_entropy, kld = validate(args.batch_size, args.use_cuda)
-
-            cross_entropy = cross_entropy.data.cpu().numpy()
-            kld = kld.data.cpu().numpy()
+        if iteration % 500 == 0:
+            # averaging across several batches
+            cross_entropy, kld = [], []
+            for i in range(5):
+                ce, kl, _ = validate(args.batch_size, args.use_cuda)
+                cross_entropy += [ce.data.cpu().numpy()]
+                kld += [kl.data.cpu().numpy()]
+            
+            kld = np.mean(kld)
+            cross_entropy = np.mean(cross_entropy)
+            ce_result += [cross_entropy]
+            kld_result += [kld]
 
             print('\n')
             print('------------VALID-------------')
@@ -80,31 +87,17 @@ if __name__ == "__main__":
             print('-------------KLD--------------')
             print(kld)
             print('------------------------------')
+
+            _, _, (sampled, expected) = validate(2, args.use_cuda, need_samples=True)
             
-            # print('dropout = ', args.dropout)
-            # for i in range(3):
-            #     target_sentence, predicted_sentence = validation_sample(args.use_cuda)
-            #     print(' target : ', target_sentence)
-            #     print('sample : ', predicted_sentence)
-            #     print('------------------------------')
-
-            ce_result += [cross_entropy]
-            kld_result += [kld]
-
-        # generate sample
-        # if iteration % 300 == 0:
-        #     source = 'she should control the speed of her car'
-        #     result = rvae.conditioned_sample(source, batch_loader, args)
-        #     print('\n')
-        #     print('------------SAMPLE------------')
-        #     print('------------------------------')
-        #     print('source : ', source)
-        #     print('sample : ', result)
-        #     print('------------------------------')
+            for s, e in zip(sampled, expected):
+                print('sampled: ' + s)
+                print('taret: ' + e)
+                print('...........................')
 
         # save model
         if iteration % 1000 == 0 or iteration == (args.num_iterations - 1):
-            t.save(paraphraser.state_dict(), 'saved_models/trained_Paraphraser_' + args.model_name)
-            np.save('saved_models/ce_result_{}.npy'.format(args.model_name), np.array(ce_result))
-            np.save('saved_models/kld_result_npy_{}'.format(args.model_name), np.array(kld_result))
+            t.save(paraphraser.state_dict(), 'saved_models/trained_paraphraser_' + args.model_name)
+            np.save('logs/ce_result_{}.npy'.format(args.model_name), np.array(ce_result))
+            np.save('logs/kld_result_npy_{}'.format(args.model_name), np.array(kld_result))
             

@@ -88,7 +88,25 @@ class Paraphraser(nn.Module):
         return train
 
     def validater(self, batch_loader):
-        def validate(batch_size, use_cuda):
+        def get_samples(logits, target):
+            '''
+            logits: [batch, seq_len, vocab_size]
+            targets: [batch, seq_len]
+            '''
+
+            prediction = F.softmax(logits, dim=-1).data.cpu().numpy()
+            target = target.data.cpu().numpy()
+
+            sampled, expected = [], []
+            for i in range(prediction.shape[0]):
+                sampled  += [' '.join([batch_loader.sample_word_from_distribution(d) 
+                    for d in prediction[i]])]
+                expected += [' '.join([batch_loader.get_word_by_idx(idx) for idx in target[i]])]
+
+            return sampled, expected
+
+
+        def validate(batch_size, use_cuda, need_samples=False):
             input = batch_loader.next_batch(batch_size, 'test')
             input = [var.cuda() if use_cuda else var for var in input]
 
@@ -99,24 +117,25 @@ class Paraphraser(nn.Module):
 
             logits, _, kld = self(0., (encoder_input_source, encoder_input_target),
                                     (decoder_input_source, decoder_input_target), 
-                                    z=None, use_cuda=use_cuda)
+                                    z=None, use_cuda=use_cuda) 
+
+
+            if need_samples:
+                sampled, expected = get_samples(logits, target)
+            else:
+                sampled, expected = (None, None)
 
             logits = logits.view(-1, self.params.vocab_size)
             target = target.view(-1)
 
             cross_entropy = F.cross_entropy(logits, target)
 
-            return cross_entropy, kld
+            return cross_entropy, kld, (sampled, expected)
 
         return validate
 
-    # def sample(self, 
-    #     batch_loader,
-    #     seq_len, 
-    #     seed, 
-    #     use_cuda,
-    #     encoder_word_input=None, encoder_character_input=None):
-    #     decoder_word_input_np, decoder_character_input_np = batch_loader.go_input(1)
+    # def sample_from_pair(self,  batch_loader, seq_len, seed, use_cuda, encoder_input=None):
+    #     decoder_word_input_np,  = batch_loader.go_input(1)
 
     #     # print('decoder word input : ', decoder_word_input_np)
 
