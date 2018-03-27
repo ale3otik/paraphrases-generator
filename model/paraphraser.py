@@ -167,7 +167,7 @@ class Paraphraser(nn.Module):
 
         initial_state = self.decoder.build_initial_state(decoder_input_source)
 
-        decoder_input = batch_loader.get_raw_input_from_sentences(batch_loader.go_label)
+        decoder_input = batch_loader.get_raw_input_from_sentences([batch_loader.go_label])
 
         result = ''
         for i in range(seq_len):
