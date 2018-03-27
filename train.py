@@ -96,6 +96,16 @@ if __name__ == "__main__":
                 print('sampled: ' + sampled[i])
                 print('...........................')
 
+        # sampling
+        if iteration % 500 == 0: 
+            print('Sampling...')
+            source = 'i want to buy white bread'
+            target = 'i have tp buy bread in the shop'
+            result = paraphraser.sample_with_pair(batch_loader, 20, args.use_cuda, source, target)
+            print('s1: ' + source)
+            print('s2: ' + target)
+            print('sampled: ' + result)
+
         # save model
         if iteration % 1000 == 0 or iteration == (args.num_iterations - 1):
             t.save(paraphraser.state_dict(), 'saved_models/trained_paraphraser_' + args.model_name)

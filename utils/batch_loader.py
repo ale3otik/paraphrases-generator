@@ -72,6 +72,21 @@ class BatchLoader:
         # target_onehot = self.get_onehot_wocab(target_idx)
         return Variable(t.from_numpy(np.array(target_idx, dtype=np.int64))).long()
 
+    def get_raw_input_from_sentences(self, sentences):
+        sentences = [self.clean_str(s).split() for s in sentences] 
+        return Variable(t.from_numpy(self.embed_batch(sentences))).float()
+
+    def input_from_sentences(self, sentences):
+        sentences = [[self.clean_str(s).split() for s in q] for q in sentences]
+        
+        encoder_input_source, encoder_input_target  = self.get_encoder_input(sentences)
+        decoder_input_source, decoder_input_target = self.get_decoder_input(sentences)
+        target = self.get_target(sentences)
+
+        return [encoder_input_source, encoder_input_target, 
+                decoder_input_source, decoder_input_target,
+                target]
+
     def next_batch(self, batch_size, type, return_sentences=False):
         if type == 'train':
             file_id = 0
@@ -79,19 +94,13 @@ class BatchLoader:
             file_id = 1
         df = self.data[file_id].sample(batch_size ,replace=False)
         sentences = [df['question1'].values, df['question2'].values]
-        sentences = [[self.clean_str(s).split() for s in q] for q in sentences]
         
-        encoder_input_source, encoder_input_target  = self.get_encoder_input(sentences)
-        decoder_input_source, decoder_input_target = self.get_decoder_input(sentences)
-        target = self.get_target(sentences)
+        input = self.input_from_sentences(sentences)
+
         if return_sentences:
-            return [encoder_input_source, encoder_input_target, 
-                    decoder_input_source, decoder_input_target,
-                    target], sentences
+            return input, [[self.clean_str(s).split() for s in q] for q in sentences]
         else:
-            return [encoder_input_source, encoder_input_target, 
-                    decoder_input_source, decoder_input_target,
-                    target]
+            return input
 
     # Original taken from https://github.com/facebookresearch/InferSent/blob/master/data.py
     def embed_batch(self, batch):

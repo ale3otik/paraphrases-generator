@@ -147,47 +147,43 @@ class Paraphraser(nn.Module):
             return cross_entropy, kld, (sampled, s1, s2)
 
         return validate
+    def sample_with_pair(self, batch_loader, seq_len, use_cuda, source_sent, target_sent):
+        input = batch_loader.input_from_sentences([[source_sent], [target_sent]])
+        input = [var.cuda() if use_cuda else var for var in input]
+        [encoder_input_source, encoder_input_target, decoder_input_source, _, _] = input
 
-    # def sample_from_pair(self,  batch_loader, seq_len, seed, use_cuda, encoder_input=None):
-    #     decoder_word_input_np,  = batch_loader.go_input(1)
+        encoder_input = [encoder_input_source, encoder_input_target]
 
-    #     # print('decoder word input : ', decoder_word_input_np)
+        # encode
+        [batch_size, _, _] = encoder_input[0].size()
 
-    #     decoder_word_input = Variable(t.from_numpy(decoder_word_input_np).long())
-    #     decoder_character_input = Variable(t.from_numpy(decoder_character_input_np).long())
-    #     if use_cuda:
-    #         decoder_word_input, decoder_character_input = decoder_word_input.cuda(), decoder_character_input.cuda()
+        mu, logvar = self.encoder(encoder_input[0], encoder_input[1])
+        std = t.exp(0.5 * logvar)
+            
+        z = Variable(t.randn([batch_size, self.params.latent_variable_size]))
+        if use_cuda:
+            z = z.cuda()
+        z = z * std + mu
 
-    #     result = ''
+        initial_state = self.decoder.build_initial_state(decoder_input_source)
 
-    #     initial_state = None
+        decoder_input = batch_loader.get_raw_input_from_sentences(batch_loader.go_label)
 
-    #     for i in range(seq_len):
-    #         logits, initial_state, _ = self(0., encoder_word_input, encoder_character_input,
-    #                                         decoder_word_input, decoder_character_input,
-    #                                         seed, initial_state)
+        result = ''
+        for i in range(seq_len):
+            if use_cuda: 
+                decoder_input = decoder_input.cuda()
+            logits, initial_state = self.decoder(None, decoder_input, z, 0.0, initial_state)
+            logits = logits.view(-1, self.params.vocab_size)
+            prediction = F.softmax(logits)
+            word = batch_loader.sample_word_from_distribution(prediction.data.cpu().numpy()[-1])
+            if word == batch_loader.end_label:
+                break
+            result += ' ' + word
 
-    #         logits = logits.view(-1, self.params.word_vocab_size)
-    #         prediction = F.softmax(logits)
+            decoder_input = batch_loader.get_raw_input_from_sentences([word])
 
-    #         word = batch_loader.sample_word_from_distribution(prediction.data.cpu().numpy()[-1])
-    #         # word = batch_loader.sample_most_pvirobable_word(prediction.data.cpu().numpy()[-1])
-
-    #         if word == batch_loader.end_token:
-    #             break
-
-    #         result += ' ' + word
-
-    #         decoder_word_input_np = np.array([[batch_loader.word_to_idx[word]]])
-    #         decoder_character_input_np = np.array([[batch_loader.encode_characters(word)]])
-
-    #         decoder_word_input = Variable(t.from_numpy(decoder_word_input_np).long())
-    #         decoder_character_input = Variable(t.from_numpy(decoder_character_input_np).long())
-
-    #         if use_cuda:
-    #             decoder_word_input, decoder_character_input = decoder_word_input.cuda(), decoder_character_input.cuda()
-
-    #     return result
+        return result
 
     # def conditioned_sample(self, input_phrase, batch_loader, args):
     #     encoder_word_input_np = batch_loader.sentence_to_word_input(input_phrase)
@@ -202,3 +198,8 @@ class Paraphraser(nn.Module):
     #     return self.sample(batch_loader, 50, None, args.use_cuda, 
     #                             encoder_word_input, encoder_character_input)
 
+    def sample_with_seed(self, batch_loader, seq_len, use_cuda, seed):
+        pass
+
+    def sample_with_phrase(self, batch_loader, seq_len, use_cuda, source_sent):
+        pass 
