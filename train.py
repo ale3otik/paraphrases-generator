@@ -90,7 +90,7 @@ if __name__ == "__main__":
 
             _, _, (sampled, s1, s2) = validate(2, args.use_cuda, need_samples=True)
             
-            for i in range(len(sampled):
+            for i in range(len(sampled)):
                 print('source: ' + s1[i])
                 print('target: ' + s2[i])
                 print('sampled: ' + sampled[i])
