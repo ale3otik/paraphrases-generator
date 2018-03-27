@@ -117,7 +117,7 @@ class Paraphraser(nn.Module):
         def validate(batch_size, use_cuda, need_samples=False):
             if need_samples:
                 input, sentences = batch_loader.next_batch(batch_size, 'test', return_sentences=True)
-                sentences = [' '.join(s) for s in sentences]
+                sentences = [[' '.join(s) for s in q] for q in sentences]
             else:
                 input = batch_loader.next_batch(batch_size, 'test')
             
