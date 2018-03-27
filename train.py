@@ -88,11 +88,12 @@ if __name__ == "__main__":
             print(kld)
             print('------------------------------')
 
-            _, _, (sampled, expected) = validate(2, args.use_cuda, need_samples=True)
+            _, _, (sampled, s1, s2) = validate(2, args.use_cuda, need_samples=True)
             
-            for s, e in zip(sampled, expected):
-                print('sampled: ' + s)
-                print('taret: ' + e)
+            for i in range(len(sampled):
+                print('source: ' + s1[i])
+                print('target: ' + s2[i])
+                print('sampled: ' + sampled[i])
                 print('...........................')
 
         # save model

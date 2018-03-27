@@ -72,7 +72,7 @@ class BatchLoader:
         # target_onehot = self.get_onehot_wocab(target_idx)
         return Variable(t.from_numpy(np.array(target_idx, dtype=np.int64))).long()
 
-    def next_batch(self, batch_size, type):
+    def next_batch(self, batch_size, type, return_sentences=False):
         if type == 'train':
             file_id = 0
         if type == 'test':
@@ -84,10 +84,14 @@ class BatchLoader:
         encoder_input_source, encoder_input_target  = self.get_encoder_input(sentences)
         decoder_input_source, decoder_input_target = self.get_decoder_input(sentences)
         target = self.get_target(sentences)
-
-        return [encoder_input_source, encoder_input_target, 
-                decoder_input_source, decoder_input_target,
-                target]
+        if return_sentences:
+            return [encoder_input_source, encoder_input_target, 
+                    decoder_input_source, decoder_input_target,
+                    target], sentences
+        else:
+            return [encoder_input_source, encoder_input_target, 
+                    decoder_input_source, decoder_input_target,
+                    target]
 
     # Original taken from https://github.com/facebookresearch/InferSent/blob/master/data.py
     def embed_batch(self, batch):

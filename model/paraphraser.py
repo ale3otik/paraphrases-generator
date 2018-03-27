@@ -94,7 +94,15 @@ class Paraphraser(nn.Module):
             targets: [batch, seq_len]
             '''
 
-            prediction = F.softmax(logits, dim=-1).data.cpu().numpy()
+            ## for version > 0.4
+            # prediction = F.softmax(logits, dim=-1).data.cpu().numpy()
+            
+            ## for version < 0.3
+            seq_len = logits.size()[1]
+            prediction = F.softmax(
+                logits.view(-1, self.params.vocab_size)).view(-1, seq_len, self.params.vocab_size)
+            prediction = prediction.data.cpu().numpy()
+            
             target = target.data.cpu().numpy()
 
             sampled, expected = [], []
@@ -107,7 +115,12 @@ class Paraphraser(nn.Module):
 
 
         def validate(batch_size, use_cuda, need_samples=False):
-            input = batch_loader.next_batch(batch_size, 'test')
+            if need_samples:
+                input, sentences = batch_loader.next_batch(batch_size, 'test', return_sentences=True)
+                sentences = [' '.join(s) for s in sentences]
+            else:
+                input = batch_loader.next_batch(batch_size, 'test')
+            
             input = [var.cuda() if use_cuda else var for var in input]
 
             [encoder_input_source, 
@@ -119,18 +132,19 @@ class Paraphraser(nn.Module):
                                     (decoder_input_source, decoder_input_target), 
                                     z=None, use_cuda=use_cuda) 
 
-
             if need_samples:
-                sampled, expected = get_samples(logits, target)
+                [s1, s2] = sentences
+                sampled, _ = get_samples(logits, target)
             else:
-                sampled, expected = (None, None)
+                s1, s2 = (None, None)
+                sampled, _ = (None, None)
 
             logits = logits.view(-1, self.params.vocab_size)
             target = target.view(-1)
 
             cross_entropy = F.cross_entropy(logits, target)
 
-            return cross_entropy, kld, (sampled, expected)
+            return cross_entropy, kld, (sampled, s1, s2)
 
         return validate
 
