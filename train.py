@@ -26,7 +26,7 @@ if __name__ == "__main__":
                         help='load pretrained model (default: False)')
     parser.add_argument('--model-name', default='', metavar='MN',
                         help='name of model to save (default: "")')
-    parser.add_argument('--weight_decay', default=0.0, metavar='WD',
+    parser.add_argument('--weight-decay', default=0.0, metavar='WD',
                         help='L2 regularization penalty (default: 0.0)')
     args = parser.parse_args()
 
