@@ -79,7 +79,7 @@ class BatchLoader:
     def input_from_sentences(self, sentences):
         sentences = [[self.clean_str(s).split() for s in q] for q in sentences]
         
-        encoder_input_source, encoder_input_target  = self.get_encoder_input(sentences)
+        encoder_input_source, encoder_input_target = self.get_encoder_input(sentences)
         decoder_input_source, decoder_input_target = self.get_decoder_input(sentences)
         target = self.get_target(sentences)
 

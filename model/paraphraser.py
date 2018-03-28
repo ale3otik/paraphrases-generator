@@ -173,6 +173,8 @@ class Paraphraser(nn.Module):
         for i in range(seq_len):
             if use_cuda: 
                 decoder_input = decoder_input.cuda()
+
+            print(decoder_input.size())
             logits, initial_state = self.decoder(None, decoder_input, z, 0.0, initial_state)
             logits = logits.view(-1, self.params.vocab_size)
             prediction = F.softmax(logits)
@@ -184,19 +186,6 @@ class Paraphraser(nn.Module):
             decoder_input = batch_loader.get_raw_input_from_sentences([word])
 
         return result
-
-    # def conditioned_sample(self, input_phrase, batch_loader, args):
-    #     encoder_word_input_np = batch_loader.sentence_to_word_input(input_phrase)
-    #     encoder_character_input_np = batch_loader.sentence_to_character_input(input_phrase)
-    #     encoder_word_input = Variable(t.from_numpy(encoder_word_input_np).long())
-    #     encoder_character_input = Variable(t.from_numpy(encoder_character_input_np).long())
-
-    #     if args.use_cuda:
-    #         encoder_word_input = encoder_word_input.cuda()
-    #         encoder_character_input = encoder_character_input.cuda()
-
-    #     return self.sample(batch_loader, 50, None, args.use_cuda, 
-    #                             encoder_word_input, encoder_character_input)
 
     def sample_with_seed(self, batch_loader, seq_len, use_cuda, seed):
         pass

@@ -25,7 +25,9 @@ if __name__ == "__main__":
     parser.add_argument('--use-trained', type=bool, default=False, metavar='UT',
                         help='load pretrained model (default: False)')
     parser.add_argument('--model-name', default='', metavar='MN',
-                        help='name of model to save (default: '')')
+                        help='name of model to save (default: "")')
+    parser.add_argument('--weight_decay', default=0.0, metavar='WD',
+                        help='L2 regularization penalty (default: 0.0)')
     args = parser.parse_args()
 
     batch_loader = BatchLoader()
@@ -44,7 +46,8 @@ if __name__ == "__main__":
     if args.use_cuda:
         paraphraser = paraphraser.cuda()
 
-    optimizer = Adam(paraphraser.learnable_parameters(), args.learning_rate)
+    optimizer = Adam(paraphraser.learnable_parameters(), args.learning_rate, 
+        weight_decay=args.weight_decay)
 
     train_step = paraphraser.trainer(optimizer, batch_loader)
     validate = paraphraser.validater(batch_loader)
@@ -91,20 +94,22 @@ if __name__ == "__main__":
             _, _, (sampled, s1, s2) = validate(2, args.use_cuda, need_samples=True)
             
             for i in range(len(sampled)):
+                result = paraphraser.sample_with_pair(batch_loader, 20, args.use_cuda, s1[i], s2[i])
                 print('source: ' + s1[i])
                 print('target: ' + s2[i])
-                print('sampled: ' + sampled[i])
+                print('valid: ' + sampled[i])
+                print('sampled: ' + result)
                 print('...........................')
 
-        # sampling
-        if iteration % 500 == 0: 
-            print('Sampling...')
-            source = 'i want to buy white bread'
-            target = 'i have tp buy bread in the shop'
-            result = paraphraser.sample_with_pair(batch_loader, 20, args.use_cuda, source, target)
-            print('s1: ' + source)
-            print('s2: ' + target)
-            print('sampled: ' + result)
+        # # sampling
+        # if iteration % 500 == 0: 
+        #     print('Sampling...')
+        #     source = 'why we get a runny nose and possibly tears when we digest a spicy food ?'
+        #     target = 'why do we get runny noses when we eat spicy food ?'
+        #     result = paraphraser.sample_with_pair(batch_loader, 20, args.use_cuda, source, target)
+        #     print('s1: ' + source)
+        #     print('s2: ' + target)
+        #     print('sampled: ' + result)
 
         # save model
         if iteration % 1000 == 0 or iteration == (args.num_iterations - 1):

@@ -14,7 +14,8 @@ class Decoder(nn.Module):
                                        batch_first=True,
                                        bidirectional=True) 
         
-        self.decoding_rnn = nn.LSTM(input_size=self.params.latent_variable_size + self.params.word_embed_size,
+        self.decoding_rnn = nn.LSTM(input_size=self.params.latent_variable_size
+                                        + self.params.word_embed_size,
                                        hidden_size=self.params.decoder_rnn_size,
                                        num_layers=self.params.decoder_num_layers,
                                        batch_first=True)
