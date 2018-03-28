@@ -174,7 +174,6 @@ class Paraphraser(nn.Module):
             if use_cuda: 
                 decoder_input = decoder_input.cuda()
 
-            print(decoder_input.size())
             logits, initial_state = self.decoder(None, decoder_input, z, 0.0, initial_state)
             logits = logits.view(-1, self.params.vocab_size)
             prediction = F.softmax(logits)
