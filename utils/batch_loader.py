@@ -21,6 +21,8 @@ class BatchLoader:
         self.end_label = '</s>'
         self.go_label = '<s>'
 
+        self.df_from_file = None
+
         self.data_files = [ path + 'data/quora/train.csv',
                            path + 'data/quora/test.csv']
         self.glove_path = path + 'data/glove.840B.300d.txt'
@@ -29,7 +31,6 @@ class BatchLoader:
             self.data = [pd.read_csv(f)[['question1', 'question2']] for f in self.data_files]
 
         self.build_vocab(sentences)
-
 
     def clean_str(self, string):
         '''
@@ -95,6 +96,29 @@ class BatchLoader:
         df = self.data[file_id].sample(batch_size ,replace=False)
         sentences = [df['question1'].values, df['question2'].values]
         
+        input = self.input_from_sentences(sentences)
+
+        if return_sentences:
+            return input, [[self.clean_str(s).split() for s in q] for q in sentences]
+        else:
+            return input
+
+    def next_batch_from_file(self, batch_size, file_name, return_sentences=False):
+        if self.df_from_file is None:
+            self.df_from_file = pd.read_csv(file_name)
+            self.cur_file_point = 0
+        
+        # file ends
+        if self.cur_file_point == len(self.df_from_file):
+            self.cur_file_point = 0
+            return None
+
+        end_point = min(self.cur_file_point + batch_size, len(self.df_from_file))
+        df = self.df_from_file.iloc[self.cur_file_point:end_point]
+        sentences = [df['question1'].values, df['question2'].values]
+        self.cur_file_point = end_point
+
+
         input = self.input_from_sentences(sentences)
 
         if return_sentences:
