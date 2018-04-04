@@ -22,6 +22,8 @@ if __name__ == "__main__":
                         help='name of file with input phrases (default: "data/quora/test.csv")')
     parser.add_argument('--output-file', default='out.txt', metavar='OF',
                     help='name of output file (default: "out.txt")')
+    parser.add_argument('--seq-len', default=30, metavar='SL',
+                    help='max length of sequence (default: 30)')
 
     args = parser.parse_args()
 
@@ -46,7 +48,7 @@ if __name__ == "__main__":
             break
 
         input, sentences = next_batch
-        result += [paraphraser.sample_with_input(batch_loader, seq_len, use_cuda, input)]
+        result += [paraphraser.sample_with_input(batch_loader, args.seq_len, use_cuda, input)]
         target += [sentences[1][0]]
         if i % 1000 == 0:
             print(i)
