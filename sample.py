@@ -48,13 +48,16 @@ if __name__ == "__main__":
             break
 
         input, sentences = next_batch
-        result += [paraphraser.sample_with_input(batch_loader, args.seq_len, use_cuda, input)]
+        input = [var.cuda() if args.use_cuda else var for var in input]
+
+        result += [paraphraser.sample_with_input(batch_loader, args.seq_len, args.use_cuda, input)]
         target += [sentences[1][0]]
         if i % 1000 == 0:
             print(i)
             print('source : ', ' '.join(sentences[0][0]))
             print('target : ', ' '.join(sentences[1][0]))
             print('sampled : ', result[-1])
+        i += 1
 
     np.save('logs/sampled_out.txt', np.array(result))
     np.save('logs/target_out.txt', np.array(target))
