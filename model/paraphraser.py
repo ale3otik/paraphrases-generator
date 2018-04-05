@@ -95,12 +95,13 @@ class Paraphraser(nn.Module):
             '''
 
             ## for version > 0.4
-            # prediction = F.softmax(logits, dim=-1).data.cpu().numpy()
+            prediction = F.softmax(logits, dim=-1).data.cpu().numpy()
             
             ## for version < 0.3
-            seq_len = logits.size()[1]
-            prediction = F.softmax(
-                logits.view(-1, self.params.vocab_size)).view(-1, seq_len, self.params.vocab_size)
+            # seq_len = logits.size()[1]
+            # prediction = F.softmax(
+            #     logits.view(-1, self.params.vocab_size)).view(-1, seq_len, self.params.vocab_size)
+            
             prediction = prediction.data.cpu().numpy()
             
             target = target.data.cpu().numpy()
@@ -175,7 +176,8 @@ class Paraphraser(nn.Module):
 
             logits, initial_state = self.decoder(None, decoder_input, z, 0.0, initial_state)
             logits = logits.view(-1, self.params.vocab_size)
-            prediction = F.softmax(logits)
+            # prediction = F.softmax(logits)
+            prediction = F.softmax(logits, dim=-1)
             word = batch_loader.sample_word_from_distribution(prediction.data.cpu().numpy()[-1])
             if word == batch_loader.end_label:
                 break
