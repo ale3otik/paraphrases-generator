@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 class BatchLoader:
-    def __init__(self, vocab_size=30000, sentences=None, path=''):
+    def __init__(self, vocab_size=25000, sentences=None, path=''):
         '''
             Build vocab for sentences or for data files in path if None. 
         '''
