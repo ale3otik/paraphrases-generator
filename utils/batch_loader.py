@@ -22,10 +22,9 @@ class BatchLoader:
         self.go_label = '<s>'
 
         self.df_from_file = None
-
-        self.data_files = [ path + 'data/quora/train.csv',
-                           path + 'data/quora/test.csv']
-        self.glove_path = path + 'data/glove.840B.300d.txt'
+        
+        self.data_files = ['data/quora/train.csv','data/quora/test.csv']
+        self.glove_path = '/home/aleksey.zotov/InferSent/dataset/GloVe/glove.840B.300d.txt'
 
         if sentences is None:
             self.data = [pd.read_csv(f)[['question1', 'question2']] for f in self.data_files]
