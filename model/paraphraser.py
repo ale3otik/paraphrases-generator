@@ -97,12 +97,13 @@ class Paraphraser(nn.Module):
             ## for version > 0.4
             prediction = F.softmax(logits, dim=-1).data.cpu().numpy()
             
+            
             ## for version < 0.3
             # seq_len = logits.size()[1]
             # prediction = F.softmax(
             #     logits.view(-1, self.params.vocab_size)).view(-1, seq_len, self.params.vocab_size)
+            # prediction = prediction.data.cpu().numpy()
             
-            prediction = prediction.data.cpu().numpy()
             
             target = target.data.cpu().numpy()
 
