@@ -6,6 +6,30 @@ from torch.autograd import Variable
 import numpy as np
 import pandas as pd
 
+def clean_str(string):
+    '''
+        Tokenization/string cleaning for all datasets except for SST.
+        Original taken from https://github.com/yoonkim/CNN_sentence/blob/master/process_data
+    '''
+    string = re.sub(r"[^가-힣A-Za-z0-9(),!?:;.\'\`]", " ", string)
+    string = re.sub(r"\'s", " \'s", string)
+    string = re.sub(r"\'ve", " \'ve", string)
+    string = re.sub(r"n\'t", " n\'t", string)
+    string = re.sub(r"\'re", " \'re", string)
+    string = re.sub(r"\'d", " \'d", string)
+    string = re.sub(r"\'ll", " \'ll", string)
+    string = re.sub(r"\.", " . ", string)
+    string = re.sub(r",", " , ", string)
+    string = re.sub(r":", " : ", string)
+    string = re.sub(r";", " ; ", string)
+    string = re.sub(r"!", " ! ", string)
+    string = re.sub(r"\(", " ( ", string)
+    string = re.sub(r"\)", " ) ", string)
+    string = re.sub(r"\?", " ? ", string)
+    string = re.sub(r"\s{2,}", " ", string)
+    return string.strip()
+
+
 class BatchLoader:
     def __init__(self, vocab_size=25000, sentences=None, path=''):
         '''
@@ -23,36 +47,13 @@ class BatchLoader:
 
         self.df_from_file = None
         
-        self.data_files = ['data/quora/train.csv','data/quora/test.csv']
+        self.data_files = [path + 'data/quora/train.csv', path + 'data/quora/test.csv']
         self.glove_path = '/home/aleksey.zotov/InferSent/dataset/GloVe/glove.840B.300d.txt'
 
         if sentences is None:
             self.data = [pd.read_csv(f)[['question1', 'question2']] for f in self.data_files]
 
         self.build_vocab(sentences)
-
-    def clean_str(self, string):
-        '''
-            Tokenization/string cleaning for all datasets except for SST.
-            Original taken from https://github.com/yoonkim/CNN_sentence/blob/master/process_data
-        '''
-        string = re.sub(r"[^가-힣A-Za-z0-9(),!?:;.\'\`]", " ", string)
-        string = re.sub(r"\'s", " \'s", string)
-        string = re.sub(r"\'ve", " \'ve", string)
-        string = re.sub(r"n\'t", " n\'t", string)
-        string = re.sub(r"\'re", " \'re", string)
-        string = re.sub(r"\'d", " \'d", string)
-        string = re.sub(r"\'ll", " \'ll", string)
-        string = re.sub(r"\.", " . ", string)
-        string = re.sub(r",", " , ", string)
-        string = re.sub(r":", " : ", string)
-        string = re.sub(r";", " ; ", string)
-        string = re.sub(r"!", " ! ", string)
-        string = re.sub(r"\(", " ( ", string)
-        string = re.sub(r"\)", " ) ", string)
-        string = re.sub(r"\?", " ? ", string)
-        string = re.sub(r"\s{2,}", " ", string)
-        return string.strip()
 
     def get_encoder_input(self, sentences):
         return [Variable(t.from_numpy(
@@ -73,11 +74,11 @@ class BatchLoader:
         return Variable(t.from_numpy(np.array(target_idx, dtype=np.int64))).long()
 
     def get_raw_input_from_sentences(self, sentences):
-        sentences = [self.clean_str(s).split() for s in sentences] 
+        sentences = [clean_str(s).split() for s in sentences] 
         return Variable(t.from_numpy(self.embed_batch(sentences))).float()
 
     def input_from_sentences(self, sentences):
-        sentences = [[self.clean_str(s).split() for s in q] for q in sentences]
+        sentences = [[clean_str(s).split() for s in q] for q in sentences]
         
         encoder_input_source, encoder_input_target = self.get_encoder_input(sentences)
         decoder_input_source, decoder_input_target = self.get_decoder_input(sentences)
@@ -98,7 +99,7 @@ class BatchLoader:
         input = self.input_from_sentences(sentences)
 
         if return_sentences:
-            return input, [[self.clean_str(s).split() for s in q] for q in sentences]
+            return input, [[clean_str(s).split() for s in q] for q in sentences]
         else:
             return input
 
@@ -121,7 +122,7 @@ class BatchLoader:
         input = self.input_from_sentences(sentences)
 
         if return_sentences:
-            return input, [[self.clean_str(s).split() for s in q] for q in sentences]
+            return input, [[clean_str(s).split() for s in q] for q in sentences]
         else:
             return input
 
@@ -200,14 +201,23 @@ class BatchLoader:
             sentences += list(df['question1'].values) + list(df['question2'].values)
         return sentences
 
+    def build_input_vocab(self, sentences):
+        word_dict = self.get_word_dict(sentences)
+        self.build_glove(word_dict)
+        print('Vocab size : {0}'.format(len(self.word_vec)))
+
+    def build_output_vocab(self, sentences):
+        self.max_seq_len = np.max([len(s) for s in sentences]) + 1
+        text = ' '.join(sentences).split()
+        self.build_most_common_vocab(text)
+
     def build_vocab(self, sentences):
         if sentences is None:
             sentences = self.get_sentences_from_data()
-        sentences = [self.clean_str(s) for s in sentences]
+        sentences = [clean_str(s) for s in sentences]
 
-        self.max_seq_len = np.max([len(s) for s in sentences]) + 1
-        word_dict = self.get_word_dict(sentences)
-        text = ' '.join(sentences).split()
-        self.build_most_common_vocab(text)
-        self.build_glove(word_dict)
-        print('Vocab size : {0}'.format(len(self.word_vec)))
+        self.build_input_vocab(sentences)
+        self.build_output_vocab(sentences)
+        
+        
+        
