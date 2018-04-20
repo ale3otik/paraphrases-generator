@@ -50,11 +50,11 @@ class BatchLoader:
         self.df_from_file = None
         
         self.quora_data_files = [path + 'data/quora/train.csv', path + 'data/quora/test.csv']
-        self.snli_path = '../../InferSent/dataset/SNLI/'
+        self.snli_path = '../InferSent/dataset/SNLI/'
         self.glove_path = '/home/aleksey.zotov/InferSent/dataset/GloVe/glove.840B.300d.txt'
 
         if sentences is None:
-            self.data = self.read_train_test_dataset()
+            self.read_train_test_dataset()
 
         self.build_vocab(sentences)
 
@@ -264,11 +264,11 @@ class BatchLoader:
 
         tr1 = s1['train']['sent'][target['train']['data'] == 0] # entailment
         tr2 = s2['train']['sent'][target['train']['data'] == 0]
-        train_df = pd.DataFrame(data=[tr1, tr2], columns=['question1', 'question2'])
+        train_df = pd.DataFrame(data=np.array([tr1, tr2]).T, columns=['question1', 'question2'])
 
         ts1 = s1['test']['sent'][target['test']['data'] == 0] # entailment
         ts2 = s2['test']['sent'][target['test']['data'] == 0]
-        test_df = pd.DataFrame(data=[ts1, ts2], columns=['question1', 'question2'])
+        test_df = pd.DataFrame(data=np.array([ts1, ts2]).T, columns=['question1', 'question2'])
 
         return [train_df, test_df]
             

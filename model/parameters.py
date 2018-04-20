@@ -12,7 +12,7 @@ class Parameters:
 
         self.latent_variable_size = 1100
 
-        self.decoder_rnn_size = 800
+        self.decoder_rnn_size = 600
         self.decoder_num_layers = 2
 
         self.kld_penalty_weight = 1.0
