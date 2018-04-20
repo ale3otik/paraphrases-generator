@@ -91,12 +91,18 @@ class BatchLoader:
                 decoder_input_source, decoder_input_target,
                 target]
 
-    def next_batch(self, batch_size, type, return_sentences=False):
+    def next_batch(self, batch_size, type, return_sentences=False, balanced=True):
         if type == 'train':
             file_id = 0
         if type == 'test':
             file_id = 1
-        df = self.data[file_id].sample(batch_size ,replace=False)
+        if balanced:
+            df1 = self.quora[file_id].sample(batch_size//2, replace=False)
+            df2 = self.snli[file_id].sample(batch_size - batch_size//2, replace=False)
+            df = df1.append(df2, ignore_index=True)
+        else:
+            df = self.data[file_id].sample(batch_size ,replace=False)
+
         sentences = [df['question1'].values, df['question2'].values]
         
         input = self.input_from_sentences(sentences)
@@ -225,13 +231,13 @@ class BatchLoader:
         
     # READ DATA 
     def read_train_test_dataset(self):
-        quora = [pd.read_csv(f)[['question1', 'question2']] for f in self.quora_data_files]
+        self.quora = [pd.read_csv(f)[['question1', 'question2']] for f in self.quora_data_files]
         print('QUORA: train: {}, test: {}'.format(len(quora[0]), len(quora[1])))
 
-        snli = self.get_nli()
+        self.snli = self.get_nli()
         print('SNLI: train: {}, test: {}'.format(len(snli[0]), len(snli[1])))
         
-        self.data = [q.append(s, ignore_index=True) for q,s in zip(quora, snli)]
+        self.data = [q.append(s, ignore_index=True) for q,s in zip(self.quora, self.snli)]
         print('ALL: train: {}, test: {}'.format(len(self.data[0]), len(self.data[1])))
 
     def get_nli(self):
