@@ -226,8 +226,13 @@ class BatchLoader:
     # READ DATA 
     def read_train_test_dataset(self):
         quora = [pd.read_csv(f)[['question1', 'question2']] for f in self.quora_data_files]
+        print('QUORA: train: {}, test: {}'.format(len(quora[0]), len(quora[1])))
+
         snli = self.get_nli()
-        self.data = [q.append(s, ignore_index=True) for q,s in zip(quora,snli)]
+        print('SNLI: train: {}, test: {}'.format(len(snli[0]), len(snli[1])))
+        
+        self.data = [q.append(s, ignore_index=True) for q,s in zip(quora, snli)]
+        print('ALL: train: {}, test: {}'.format(len(self.data[0]), len(self.data[1])))
 
     def get_nli(self):
         # https://github.com/facebookresearch/InferSent (c)
@@ -256,8 +261,6 @@ class BatchLoader:
             assert len(s1[data_type]['sent']) == len(s2[data_type]['sent']) == \
                 len(target[data_type]['data'])
 
-            print('** {0} DATA : Found {1} pairs of {2} sentences.'.format(
-                    data_type.upper(), len(s1[data_type]['sent']), data_type))
 
         train = {'s1': s1['train']['sent'], 's2': s2['train']['sent'],
                  'label': target['train']['data']}
@@ -269,6 +272,5 @@ class BatchLoader:
         ts1 = s1['test']['sent'][target['test']['data'] == 0] # entailment
         ts2 = s2['test']['sent'][target['test']['data'] == 0]
         test_df = pd.DataFrame(data=np.array([ts1, ts2]).T, columns=['question1', 'question2'])
-
         return [train_df, test_df]
             
