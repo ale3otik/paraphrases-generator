@@ -27,6 +27,8 @@ def clean_str(string):
     string = re.sub(r"\)", " ) ", string)
     string = re.sub(r"\?", " ? ", string)
     string = re.sub(r"\s{2,}", " ", string)
+    string = re.sub(r'\W+', ' ', string)
+    string = string.lower()
     return string.strip()
 
 
@@ -47,11 +49,12 @@ class BatchLoader:
 
         self.df_from_file = None
         
-        self.data_files = [path + 'data/quora/train.csv', path + 'data/quora/test.csv']
+        self.quora_data_files = [path + 'data/quora/train.csv', path + 'data/quora/test.csv']
+        self.snli_path = '../../InferSent/dataset/SNLI/'
         self.glove_path = '/home/aleksey.zotov/InferSent/dataset/GloVe/glove.840B.300d.txt'
 
         if sentences is None:
-            self.data = [pd.read_csv(f)[['question1', 'question2']] for f in self.data_files]
+            self.data = self.read_train_test_dataset()
 
         self.build_vocab(sentences)
 
@@ -220,4 +223,52 @@ class BatchLoader:
         self.build_output_vocab(sentences)
         
         
+    # READ DATA 
+    def read_train_test_dataset(self):
+        quora = [pd.read_csv(f)[['question1', 'question2']] for f in self.quora_data_files]
+        snli = self.get_nli()
+        self.data = [q.append(s, ignore_index=True) for q,s in zip(quora,snli)]
+
+    def get_nli():
+        # https://github.com/facebookresearch/InferSent (c)
+        data_path = self.snli_path
         
+        s1 = {}
+        s2 = {}
+        target = {}
+
+        dico_label = {'entailment': 0,  'neutral': 1, 'contradiction': 2}
+
+        for data_type in ['train', 'dev', 'test']:
+            s1[data_type], s2[data_type], target[data_type] = {}, {}, {}
+            s1[data_type]['path'] = os.path.join(data_path, 's1.' + data_type)
+            s2[data_type]['path'] = os.path.join(data_path, 's2.' + data_type)
+            target[data_type]['path'] = os.path.join(data_path,
+                                                     'labels.' + data_type)
+
+            s1[data_type]['sent'] = np.array([line.rstrip() for line in
+                                     open(s1[data_type]['path'], 'r')])
+            s2[data_type]['sent'] = np.array([line.rstrip() for line in
+                                     open(s2[data_type]['path'], 'r')])
+            target[data_type]['data'] = np.array([dico_label[line.rstrip('\n')]
+                    for line in open(target[data_type]['path'], 'r')])
+
+            assert len(s1[data_type]['sent']) == len(s2[data_type]['sent']) == \
+                len(target[data_type]['data'])
+
+            print('** {0} DATA : Found {1} pairs of {2} sentences.'.format(
+                    data_type.upper(), len(s1[data_type]['sent']), data_type))
+
+        train = {'s1': s1['train']['sent'], 's2': s2['train']['sent'],
+                 'label': target['train']['data']}
+
+        tr1 = s1['train']['sent'][target['train']['data'] == 0] # entailment
+        tr2 = s2['train']['sent'][target['train']['data'] == 0]
+        train_df = pd.DataFrame(data=[tr1, tr2], columns=['question1', 'question2'])
+
+        ts1 = s1['test']['sent'][target['test']['data'] == 0] # entailment
+        ts2 = s2['test']['sent'][target['test']['data'] == 0]
+        test_df = pd.DataFrame(data=[ts1, ts2], columns=['question1', 'question2'])
+
+        return [train_df, test_df]
+            
