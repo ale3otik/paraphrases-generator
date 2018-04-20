@@ -229,7 +229,7 @@ class BatchLoader:
         snli = self.get_nli()
         self.data = [q.append(s, ignore_index=True) for q,s in zip(quora,snli)]
 
-    def get_nli():
+    def get_nli(self):
         # https://github.com/facebookresearch/InferSent (c)
         data_path = self.snli_path
         
