@@ -232,10 +232,10 @@ class BatchLoader:
     # READ DATA 
     def read_train_test_dataset(self):
         self.quora = [pd.read_csv(f)[['question1', 'question2']] for f in self.quora_data_files]
-        print('QUORA: train: {}, test: {}'.format(len(quora[0]), len(quora[1])))
+        print('QUORA: train: {}, test: {}'.format(len(self.quora[0]), len(self.quora[1])))
 
         self.snli = self.get_nli()
-        print('SNLI: train: {}, test: {}'.format(len(snli[0]), len(snli[1])))
+        print('SNLI: train: {}, test: {}'.format(len(self.snli[0]), len(self.snli[1])))
         
         self.data = [q.append(s, ignore_index=True) for q,s in zip(self.quora, self.snli)]
         print('ALL: train: {}, test: {}'.format(len(self.data[0]), len(self.data[1])))
