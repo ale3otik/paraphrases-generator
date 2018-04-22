@@ -33,7 +33,7 @@ def clean_str(string):
 
 
 class BatchLoader:
-    def __init__(self, vocab_size=25000, sentences=None, path=''):
+    def __init__(self, vocab_size=25000, sentences=None, datasets={'quora'}, path=''):
         '''
             Build vocab for sentences or for data files in path if None. 
         '''
@@ -48,7 +48,7 @@ class BatchLoader:
         self.go_label = '<s>'
 
         self.df_from_file = None
-        
+        self.datasets = datasets
         self.quora_data_files = [path + 'data/quora/train.csv', path + 'data/quora/test.csv']
         self.snli_path = '../InferSent/dataset/SNLI/'
         self.glove_path = '/home/aleksey.zotov/InferSent/dataset/GloVe/glove.840B.300d.txt'
@@ -96,12 +96,18 @@ class BatchLoader:
             file_id = 0
         if type == 'test':
             file_id = 1
+
         if balanced:
-            df1 = self.quora[file_id].sample(batch_size//2, replace=False)
-            df2 = self.snli[file_id].sample(batch_size - batch_size//2, replace=False)
-            df = df1.append(df2, ignore_index=True)
+            df = pd.DataFrame()
+            length = batch_size//len(self.datasets)
+            if 'quora' in self.datasets:
+                df = df.append(self.quora[file_id].sample(length, replace=False), ignore_index=True)
+            if 'snli' in self.datasets:
+                df = df.append(self.snli[file_id].sample(length, replace=False), ignore_index=True)
+            if 'mscoco' in self.datasets:
+                df = df.append(self.mscoco[file_id].sample(length, replace=False), ignore_index=True)
         else:
-            df = self.data[file_id].sample(batch_size ,replace=False)
+            df = self.data[file_id].sample(batch_size , replace=False)
 
         sentences = [df['question1'].values, df['question2'].values]
         
@@ -236,13 +242,23 @@ class BatchLoader:
         
     # READ DATA 
     def read_train_test_dataset(self):
-        self.quora = [pd.read_csv(f)[['question1', 'question2']] for f in self.quora_data_files]
-        print('QUORA: train: {}, test: {}'.format(len(self.quora[0]), len(self.quora[1])))
+        self.data = [pd.DataFrame(), pd.DataFrame()]
 
-        self.snli = self.get_nli()
-        print('SNLI: train: {}, test: {}'.format(len(self.snli[0]), len(self.snli[1])))
+        if 'quora' in self.datasets:
+            self.quora = [pd.read_csv(f)[['question1', 'question2']] for f in self.quora_data_files]
+            print('QUORA: train: {}, test: {}'.format(len(self.quora[0]), len(self.quora[1])))
+            self.data = [d.append(q, ignore_index=True) for d,q in zip(self.data, self.quora)]
+
+        if 'snli' in self.datasets:    
+            self.snli = self.get_nli()
+            print('SNLI: train: {}, test: {}'.format(len(self.snli[0]), len(self.snli[1])))
+            self.data = [d.append(s, ignore_index=True) for d,s in zip(self.data, self.snli)]
+
+        if 'mscoco' in self.datasets:    
+            self.mscoco = self.get_mscoco()
+            print('MSCOCO: train: {}, test: {}'.format(len(self.mscoco[0]), len(self.mscoco[1])))
+            self.data = [d.append(m, ignore_index=True) for d,m in zip(self.data, self.mscoco)]
         
-        self.data = [q.append(s, ignore_index=True) for q,s in zip(self.quora, self.snli)]
         print('ALL: train: {}, test: {}'.format(len(self.data[0]), len(self.data[1])))
 
     def get_nli(self):
