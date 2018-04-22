@@ -180,6 +180,7 @@ class Paraphraser(nn.Module):
             # prediction = F.softmax(logits)
             prediction = F.softmax(logits, dim=-1)
             word = batch_loader.likely_word_from_distribution(prediction.data.cpu().numpy()[-1])
+            # word = batch_loader.sample_word_from_distribution(prediction.data.cpu().numpy()[-1])
             if word == batch_loader.end_label:
                 break
             result += ' ' + word
