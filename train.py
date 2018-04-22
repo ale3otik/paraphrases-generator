@@ -35,13 +35,19 @@ if __name__ == "__main__":
                             batch_loader.vocab_size)
 
     paraphraser = Paraphraser(parameters)
-    ce_result = []
-    kld_result = []
+    ce_result_valid = []
+    kld_result_valid = []
+    ce_result_train = []
+    kld_result_train = []
+    ce_cur_train = []
+    kld_cur_train = []
 
     if args.use_trained:
         paraphraser.load_state_dict(t.load('saved_models/trained_paraphraser_' + args.model_name))
-        ce_result = list(np.load('logs/ce_result_{}.npy'.format(args.model_name)))
-        kld_result = list(np.load('logs/kld_result_npy_{}.npy'.format(args.model_name)))
+        ce_result_valid = list(np.load('logs/ce_result_valid_{}.npy'.format(args.model_name)))
+        kld_result_valid = list(np.load('logs/kld_result_valid_{}.npy'.format(args.model_name)))
+        ce_result_train = list(np.load('logs/ce_result_train_{}.npy'.format(args.model_name)))
+        kld_result_train = list(np.load('logs/kld_result_train_{}.npy'.format(args.model_name)))
 
     if args.use_cuda:
         paraphraser = paraphraser.cuda()
@@ -56,21 +62,28 @@ if __name__ == "__main__":
 
         cross_entropy, kld, coef = train_step(iteration, args.batch_size, args.use_cuda, args.dropout)
 
-        if iteration % 100 == 0:
+        ce_cur_train += [cross_entropy.data.cpu().numpy()]
+        kld_cur_train += [kld.data.cpu().numpy()]
+
+        # validation
+        if iteration % 500 == 0:
+            ce_result_train += [np.mean(ce_cur_train)]
+            kld_result_train += [np.mean(kld_cur_train)]
+            ce_cur_train, kld_cur_train = [], []
+
             print('\n')
             print('------------TRAIN-------------')
             print('----------ITERATION-----------')
             print(iteration)
             print('--------CROSS-ENTROPY---------')
-            print(cross_entropy.data.cpu().numpy())
+            print(ce_result_train[-1])
             print('-------------KLD--------------')
-            print(kld.data.cpu().numpy())
+            print(kld_result_train[-1])
             print('-----------KLD-coef-----------')
             print(coef)
             print('------------------------------')
 
-        # validation
-        if iteration % 500 == 0:
+
             # averaging across several batches
             cross_entropy, kld = [], []
             for i in range(5):
@@ -80,8 +93,8 @@ if __name__ == "__main__":
             
             kld = np.mean(kld)
             cross_entropy = np.mean(cross_entropy)
-            ce_result += [cross_entropy]
-            kld_result += [kld]
+            ce_result_valid += [cross_entropy]
+            kld_result_valid += [kld]
 
             print('\n')
             print('------------VALID-------------')
@@ -101,19 +114,11 @@ if __name__ == "__main__":
                 print('sampled: ' + result)
                 print('...........................')
 
-        # # sampling
-        # if iteration % 500 == 0: 
-        #     print('Sampling...')
-        #     source = 'why we get a runny nose and possibly tears when we digest a spicy food ?'
-        #     target = 'why do we get runny noses when we eat spicy food ?'
-        #     result = paraphraser.sample_with_pair(batch_loader, 20, args.use_cuda, source, target)
-        #     print('s1: ' + source)
-        #     print('s2: ' + target)
-        #     print('sampled: ' + result)
-
         # save model
         if iteration % 1000 == 0 or iteration == (args.num_iterations - 1):
             t.save(paraphraser.state_dict(), 'saved_models/trained_paraphraser_' + args.model_name)
-            np.save('logs/ce_result_{}.npy'.format(args.model_name), np.array(ce_result))
-            np.save('logs/kld_result_npy_{}'.format(args.model_name), np.array(kld_result))
+            np.save('logs/ce_result_valid_{}.npy'.format(args.model_name), np.array(ce_result_valid))
+            np.save('logs/kld_result_valid_{}'.format(args.model_name), np.array(kld_result_valid))
+            np.save('logs/ce_result_train_{}.npy'.format(args.model_name), np.array(ce_result_train))
+            np.save('logs/kld_result_train_{}'.format(args.model_name), np.array(kld_result_train))
             
