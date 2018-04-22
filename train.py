@@ -26,11 +26,11 @@ if __name__ == "__main__":
                         help='load pretrained model (default: False)')
     parser.add_argument('--model-name', default='', metavar='MN',
                         help='name of model to save (default: "")')
-    parser.add_argument('--weight-decay', default=0.0, metavar='WD',
+    parser.add_argument('--weight-decay', default=0.0, type=float, metavar='WD',
                         help='L2 regularization penalty (default: 0.0)')
-    parser.add_argument('--use-quora', default=True, metavar='quora', 
+    parser.add_argument('--use-quora', default=True, type=bool, metavar='quora', 
                     help='if include quora dataset (default: True)')
-    parser.add_argument('--use-snli', default=True, metavar='snli', 
+    parser.add_argument('--use-snli', default=True, type=bool, metavar='snli', 
                     help='if include snli dataset (default: True)')
 
     args = parser.parse_args()
