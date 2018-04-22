@@ -28,12 +28,20 @@ if __name__ == "__main__":
                         help='name of model to save (default: "")')
     parser.add_argument('--weight-decay', default=0.0, metavar='WD',
                         help='L2 regularization penalty (default: 0.0)')
-    parser.add_argument('--datasets', default=['quora'], metavar='DS', 
-                    help='included datasets (default: ["quora"])')
+    parser.add_argument('--use-quora', default=True, metavar='quora', 
+                    help='if include quora dataset (default: True)')
+    parser.add_argument('--use-snli', default=True, metavar='snli', 
+                    help='if include snli dataset (default: True)')
 
     args = parser.parse_args()
+    
+    datasets = {}
+    if args.use_quora:
+        datasets.add('quora')
+    if args.use_snli:
+        datasets.add('snli')
 
-    batch_loader = BatchLoader(datasets=args.datasets)
+    batch_loader = BatchLoader(datasets=datasets)
     parameters = Parameters(batch_loader.max_seq_len,
                             batch_loader.vocab_size)
 
