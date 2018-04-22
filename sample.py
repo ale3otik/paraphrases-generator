@@ -32,7 +32,7 @@ if __name__ == "__main__":
                     help='if include snli dataset (default: True)')
 
     args = parser.parse_args()
-    datasets = {}
+    datasets = set()
     if args.use_quora:
         datasets.add('quora')
     if args.use_snli:
