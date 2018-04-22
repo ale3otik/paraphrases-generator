@@ -36,9 +36,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     datasets = set()
-    if args.use_quora:
+    if args.use_quora == 'True':
         datasets.add('quora')
-    if args.use_snli:
+    if args.use_snli == 'True':
         datasets.add('snli')
 
     batch_loader = BatchLoader(datasets=datasets)
