@@ -170,7 +170,7 @@ class Paraphraser(nn.Module):
 
         decoder_input = batch_loader.get_raw_input_from_sentences([batch_loader.go_label])
 
-        result = ''
+        result = np.array()
         for i in range(seq_len):
             if use_cuda: 
                 decoder_input = decoder_input.cuda()
@@ -179,7 +179,7 @@ class Paraphraser(nn.Module):
             logits = logits.view(-1, self.params.vocab_size)
             # prediction = F.softmax(logits)
             prediction = F.softmax(logits, dim=-1)
-            word = batch_loader.sample_word_from_distribution(prediction.data.cpu().numpy()[-1])
+            word = batch_loader.likely_word_from_distribution(prediction.data.cpu().numpy()[-1])
             if word == batch_loader.end_label:
                 break
             result += ' ' + word

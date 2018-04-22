@@ -170,8 +170,13 @@ class BatchLoader:
         self.word_to_idx = {self.idx_to_word[i] : i for i in range(self.vocab_size)}
     
     def sample_word_from_distribution(self, distribution):
-        assert len(distribution) == self.vocab_size
+        assert distribution.shape[-1] == self.vocab_size
         ix = np.random.choice(range(self.vocab_size), p=distribution.ravel())
+        return self.idx_to_word[ix]
+
+    def likely_word_from_distribution(self, distribution):
+        assert distribution.shape[-1] == self.vocab_size
+        ix = np.argmax(distribution.ravel())
         return self.idx_to_word[ix]
     
     def get_onehot_vocab(self, ids):
