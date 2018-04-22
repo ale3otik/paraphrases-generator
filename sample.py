@@ -59,8 +59,8 @@ if __name__ == "__main__":
             print('sampled : ', result[-1])
         i += 1
 
-    np.save('logs/sampled_out.txt', np.array(result))
-    np.save('logs/target_out.txt', np.array(target))
+    np.save('logs/sampled_out_{}.txt'.format(args.model_name), np.array(result))
+    np.save('logs/target_out_{}.txt'.format(args.model_name), np.array(target))
     print('------------------------------')
     print('END')
 
