@@ -24,13 +24,12 @@ if __name__ == "__main__":
                     help='name of output file (default: "out.txt")')
     parser.add_argument('--seq-len', default=30, metavar='SL',
                     help='max length of sequence (default: 30)')
-    parser.add_argument('--seq-len', default=30, metavar='SL',
-                    help='max length of sequence (default: 30)')
-    parser.add_argument('--datasets', default=[quora], metavar='DS', help='included datasets')
+    parser.add_argument('--datasets', default=['quora'], metavar='DS', 
+                    help='included datasets (default: ["quora"])')
 
     args = parser.parse_args()
 
-    batch_loader = BatchLoader()
+    batch_loader = BatchLoader(datasets=args.datasets)
     parameters = Parameters(batch_loader.max_seq_len,
                             batch_loader.vocab_size)
 
