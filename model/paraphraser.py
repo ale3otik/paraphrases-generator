@@ -170,7 +170,7 @@ class Paraphraser(nn.Module):
 
         decoder_input = batch_loader.get_raw_input_from_sentences([batch_loader.go_label])
 
-        result = np.array()
+        result = ''
         for i in range(seq_len):
             if use_cuda: 
                 decoder_input = decoder_input.cuda()
