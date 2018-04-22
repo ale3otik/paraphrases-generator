@@ -33,7 +33,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    batch_loader = BatchLoader(args.datasets)
+    batch_loader = BatchLoader(datasets=args.datasets)
     parameters = Parameters(batch_loader.max_seq_len,
                             batch_loader.vocab_size)
 
