@@ -89,7 +89,7 @@ if __name__ == "__main__":
 
             # averaging across several batches
             cross_entropy, kld = [], []
-            for i in range(5):
+            for i in range(20):
                 ce, kl, _ = validate(args.batch_size, args.use_cuda)
                 cross_entropy += [ce.data.cpu().numpy()]
                 kld += [kl.data.cpu().numpy()]
