@@ -33,7 +33,7 @@ def clean_str(string):
 
 
 class BatchLoader:
-    def __init__(self, vocab_size=25000, sentences=None, datasets={'quora'}, path=''):
+    def __init__(self, vocab_size=25000, sentences=None, datasets=['quora'], path=''):
         '''
             Build vocab for sentences or for data files in path if None. 
         '''
