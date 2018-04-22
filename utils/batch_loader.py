@@ -188,7 +188,7 @@ class BatchLoader:
     def get_onehot_vocab(self, ids):
         batch_size = len(ids)
         max_seq_len = np.max([len(x) for x in ids])
-        res = np.zeros((batch_size, max_seq_len, self.vocab_size),dtype=np.int32)
+        res = np.zeros((batch_size, max_seq_len, self.vocab_size), dtype=np.int32)
         for i in range(batch_size):
             for j in range(max_seq_len):
                 if j < len(ids[i]):
