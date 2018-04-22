@@ -24,6 +24,9 @@ if __name__ == "__main__":
                     help='name of output file (default: "out.txt")')
     parser.add_argument('--seq-len', default=30, metavar='SL',
                     help='max length of sequence (default: 30)')
+    parser.add_argument('--seq-len', default=30, metavar='SL',
+                    help='max length of sequence (default: 30)')
+    parser.add_argument('--datasets', default=[quora], metavar='DS', help='included datasets')
 
     args = parser.parse_args()
 
