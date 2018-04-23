@@ -51,6 +51,7 @@ class BatchLoader:
         self.datasets = datasets
         self.quora_data_files = [path + 'data/quora/train.csv', path + 'data/quora/test.csv']
         self.snli_path = '../InferSent/dataset/SNLI/'
+        self.mscoco_path = 'data/mscoco/'
         self.glove_path = '/home/aleksey.zotov/InferSent/dataset/GloVe/glove.840B.300d.txt'
 
         if sentences is None:
@@ -260,6 +261,10 @@ class BatchLoader:
             self.data = [d.append(m, ignore_index=True) for d,m in zip(self.data, self.mscoco)]
         
         print('ALL: train: {}, test: {}'.format(len(self.data[0]), len(self.data[1])))
+    
+    def get_mscoco(self):
+        return [pd.read_csv(self.mscoco_path + 'train.csv'),
+                pd.read_csv(self.mscoco_path + 'valid.csv')]
 
     def get_nli(self):
         # https://github.com/facebookresearch/InferSent (c)

@@ -29,9 +29,11 @@ if __name__ == "__main__":
     parser.add_argument('--weight-decay', default=0.0, type=float, metavar='WD',
                         help='L2 regularization penalty (default: 0.0)')
     parser.add_argument('--use-quora', default=False, type=bool, metavar='quora', 
-                    help='if include quora dataset (default: True)')
+                    help='if include quora dataset (default: False)')
     parser.add_argument('--use-snli', default=False, type=bool, metavar='snli', 
-                    help='if include snli dataset (default: True)')
+                    help='if include snli dataset (default: False)')
+    parser.add_argument('--use-coco', default=False, type=bool, metavar='coco', 
+                    help='if include mscoco dataset (default: False)')
 
     args = parser.parse_args()
     
@@ -40,6 +42,8 @@ if __name__ == "__main__":
         datasets.add('quora')
     if args.use_snli is True:
         datasets.add('snli')
+    if args.use_coco is True:
+        datasets.add('mscoco')
 
     batch_loader = BatchLoader(datasets=datasets)
     parameters = Parameters(batch_loader.max_seq_len,
@@ -126,7 +130,7 @@ if __name__ == "__main__":
                 print('...........................')
 
         # save model
-        if iteration % 1000 == 0 or iteration == (args.num_iterations - 1):
+        if (iteration % 1000 == 0 and iteration != 0) or iteration == (args.num_iterations - 1):
             t.save(paraphraser.state_dict(), 'saved_models/trained_paraphraser_' + args.model_name)
             np.save('logs/ce_result_valid_{}.npy'.format(args.model_name), np.array(ce_result_valid))
             np.save('logs/kld_result_valid_{}'.format(args.model_name), np.array(kld_result_valid))
