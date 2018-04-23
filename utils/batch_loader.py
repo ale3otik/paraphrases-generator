@@ -168,6 +168,7 @@ class BatchLoader:
         word_dict['<s>'] = ''
         word_dict['</s>'] = ''
         word_dict['<p>'] = ''
+        word_dict['null'] = ''
         return word_dict
     
     def build_most_common_vocab(self, sentences):
