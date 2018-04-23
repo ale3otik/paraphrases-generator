@@ -28,9 +28,9 @@ if __name__ == "__main__":
                         help='name of model to save (default: "")')
     parser.add_argument('--weight-decay', default=0.0, type=float, metavar='WD',
                         help='L2 regularization penalty (default: 0.0)')
-    parser.add_argument('--use-quora', default=True, type=bool, metavar='quora', 
+    parser.add_argument('--use-quora', default=False, type=bool, metavar='quora', 
                     help='if include quora dataset (default: True)')
-    parser.add_argument('--use-snli', default=True, type=bool, metavar='snli', 
+    parser.add_argument('--use-snli', default=False, type=bool, metavar='snli', 
                     help='if include snli dataset (default: True)')
 
     args = parser.parse_args()
