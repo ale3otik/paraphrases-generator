@@ -150,7 +150,7 @@ class Paraphraser(nn.Module):
 
         return validate
 
-    def sample_with_input(self, batch_loader, seq_len, use_cuda, use_mean input):
+    def sample_with_input(self, batch_loader, seq_len, use_cuda, use_mean, input):
         [encoder_input_source, encoder_input_target, decoder_input_source, _, _] = input
 
         encoder_input = [encoder_input_source, encoder_input_target]
