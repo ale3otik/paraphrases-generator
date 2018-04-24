@@ -22,6 +22,8 @@ if __name__ == "__main__":
                         help='name of file with input phrases (default: "data/quora/test.csv")')
     parser.add_argument('--output-file', default='out.txt', metavar='OF',
                     help='name of output file (default: "out.txt")')
+    parser.add_argument('--use-mean', type=bool, default=False, metavar='UM',
+                    help='use mean value instead of sampling z')
     parser.add_argument('--seq-len', default=30, metavar='SL',
                     help='max length of sequence (default: 30)')
     parser.add_argument('--use-quora', default=False, type=bool, metavar='quora', 
@@ -39,6 +41,8 @@ if __name__ == "__main__":
         datasets.add('snli')
     if args.use_coco is True:
         datasets.add('mscoco')
+
+    print('use mean' , args.use_mean)
 
     batch_loader = BatchLoader(datasets=datasets)
     parameters = Parameters(batch_loader.max_seq_len,
@@ -63,7 +67,11 @@ if __name__ == "__main__":
         input, sentences = next_batch
         input = [var.cuda() if args.use_cuda else var for var in input]
 
-        result += [paraphraser.sample_with_input(batch_loader, args.seq_len, args.use_cuda, input)]
+        result += [paraphraser.sample_with_input(batch_loader,
+                                 args.seq_len, 
+                                 args.use_cuda,
+                                 args.use_mean,
+                                input)]
         target += [sentences[1][0]]
         if i % 1000 == 0:
             print(i)
@@ -72,8 +80,10 @@ if __name__ == "__main__":
             print('sampled : ', result[-1])
         i += 1
 
-    np.save('logs/sampled_out_{}.txt'.format(args.model_name), np.array(result))
-    np.save('logs/target_out_{}.txt'.format(args.model_name), np.array(target))
+    np.save('logs/sampled_out_{}{}.txt'.format(
+        'mean_' if args.use_mean else '', args.model_name), np.array(result))
+    np.save('logs/target_out_{}{}.txt'.format(
+        'mean_' if args.use_mean else '', args.model_name), np.array(target))
     print('------------------------------')
     print('END')
 

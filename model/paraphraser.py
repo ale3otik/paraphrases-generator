@@ -150,7 +150,7 @@ class Paraphraser(nn.Module):
 
         return validate
 
-    def sample_with_input(self, batch_loader, seq_len, use_cuda, input):
+    def sample_with_input(self, batch_loader, seq_len, use_cuda, use_mean input):
         [encoder_input_source, encoder_input_target, decoder_input_source, _, _] = input
 
         encoder_input = [encoder_input_source, encoder_input_target]
@@ -161,10 +161,13 @@ class Paraphraser(nn.Module):
         mu, logvar = self.encoder(encoder_input[0], encoder_input[1])
         std = t.exp(0.5 * logvar)
             
-        z = Variable(t.randn([batch_size, self.params.latent_variable_size]))
-        if use_cuda:
-            z = z.cuda()
-        z = z * std + mu
+        if use_mean:
+            z = mu
+        else: 
+            z = Variable(t.randn([batch_size, self.params.latent_variable_size]))
+            if use_cuda:
+                z = z.cuda()
+            z = z * std + mu
 
         initial_state = self.decoder.build_initial_state(decoder_input_source)
 
