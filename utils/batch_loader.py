@@ -51,7 +51,7 @@ class BatchLoader:
         self.datasets = datasets
         self.quora_data_files = [path + 'data/quora/train.csv', path + 'data/quora/test.csv']
         self.snli_path = '../InferSent/dataset/SNLI/'
-        self.mscoco_path = 'data/mscoco/'
+        self.mscoco_path = path + 'data/mscoco/'
         self.glove_path = '/home/aleksey.zotov/InferSent/dataset/GloVe/glove.840B.300d.txt'
 
         if sentences is None:
