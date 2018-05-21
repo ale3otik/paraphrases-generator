@@ -195,7 +195,7 @@ class Paraphraser(nn.Module):
     def sample_with_pair(self, batch_loader, seq_len, use_cuda, source_sent, target_sent):
         input = batch_loader.input_from_sentences([[source_sent], [target_sent]])
         input = [var.cuda() if use_cuda else var for var in input]
-        return self.sample_with_input(batch_loader, seq_len, use_cuda, input)
+        return self.sample_with_input(batch_loader, seq_len, use_cuda, False, input)
 
     def sample_with_seed(self, batch_loader, seq_len, use_cuda, seed):
         pass

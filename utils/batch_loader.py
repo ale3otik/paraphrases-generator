@@ -112,6 +112,10 @@ class BatchLoader:
 
         sentences = [df['question1'].values, df['question2'].values]
         
+        # swap source and target
+        if np.random.rand() < 0.5: 
+            sentences = [sentences[1], sentences[0]]
+        
         input = self.input_from_sentences(sentences)
 
         if return_sentences:
