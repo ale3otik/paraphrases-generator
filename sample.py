@@ -86,7 +86,7 @@ if __name__ == "__main__":
     sampled_file_dst = 'logs/sampled_out_{}_{}{}.txt'.format(args.input_file,
                                             'mean_' if args.use_mean else '', args.model_name)
     target_file_dst = 'logs/target_out_{}_{}{}.txt'.format(args.input_file,
-                                            'mean_' if args.use_mean else ''
+                                            'mean_' if args.use_mean else '')
     np.save(sampled_file_dst, np.array(result))
     np.save(target_file_dst, args.model_name), np.array(target))
     print('------------------------------')
