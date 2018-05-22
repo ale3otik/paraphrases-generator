@@ -1,0 +1,425 @@
+SAMPLES:
+
+MODEL:snli_200kit_600_800
+snli: 
+source :  this church choir sings to the masses as they sing joyous songs from the book at a church
+target :  the church is filled with song
+sampled :   the choir is singing with a church
+
+source :  a kneeling man bends his ear to listen on another in front of a guitar and audio equipment
+target :  two men are near audio equipment
+sampled :   someone is using a laptop computer
+
+source :  a five piece horn band all playing in a hall of what looks like a church
+target :  there are people playing music
+sampled :   there are people playing the band
+
+source :  uniformed group walks down a street
+target :  a group of people walk down the street
+sampled :   a group of people walk down the street
+
+###
+mscoco: 
+source :  a black honda motorcycle parked in front of a garage
+target :  a honda motorcycle parked in a grass driveway
+sampled :   a motorcycle parked parked in a parking lot
+
+source :  a large church building with a massive clock tower
+target :  a church building with a tall narrow clock tower
+sampled :   an orchestra with a white building tower tower
+
+source :  a kitchen filled with a wooden cabinet and a large window
+target :  picture of a kitchen with some plants and a window
+sampled :   inside of a kitchen with a spoon and a man and a woman
+
+source :  a red toilet in a very small bathroom
+target :  an old toilet painted red with a wooden lid
+sampled :   an image washer of a brown tub with a mop
+
+source :  a jet liner flying above in the clear blue sky
+target :  an airliner as seen from the ground through some power lines
+sampled :   an airplane flies through the air from a high flight of smoke
+
+source :  a person adjusting a metal object hanging from a ceiling
+target :  a lady in a bath robe touching something near the ceiling
+sampled :   a man on a scaffold putting metal letters on the ceiling
+
+### 
+quora : 
+source :  why are questions on quora so stupid
+target :  why are my questions on quora so stupid
+sampled :   we are answer to answer on an answer your your ears
+1000
+source :  will donald trump shut down the internet
+target :  if donald trump becomes president will we lose the internet
+sampled :   one responders prepossessing pizza and joe s pizza pizza s pizza
+2000
+source :  what is the best feeling that you have ever had in your life
+target :  what was your best feeling in the world
+sampled :   i see to do a job
+3000
+source :  what are logic gates
+target :  what is a logic gate
+sampled :   here is a nighttime event
+4000
+source :  can i increase my height after 20 how
+target :  is that possible to increase height after age 21 if possible how
+sampled :   this is temporarily to see if i hope this this
+5000
+source :  specifications wise which is the better console xbox one or playstation 4
+target :  what s the best gaming console xbox one or playstation 4
+sampled :   we can see the i i i this this
+#################################################################
+
+MODEL:snli_200kit_600_600:
+snli:
+0
+source :  this church choir sings to the masses as they sing joyous songs from the book at a church
+target :  the church is filled with song
+sampled :   the group is singing with their instruments
+1000
+source :  a kneeling man bends his ear to listen on another in front of a guitar and audio equipment
+target :  two men are near audio equipment
+sampled :   a man is near electronic music
+2000
+source :  a five piece horn band all playing in a hall of what looks like a church
+target :  there are people playing music
+sampled :   there are people indoors
+3000
+source :  uniformed group walks down a street
+target :  a group of people walk down the street
+sampled :   a group of people walk down the street
+
+##
+mscoco:
+source :  a black honda motorcycle parked in front of a garage
+target :  a honda motorcycle parked in a grass driveway
+sampled :   a motorcycle parked parked in a parking lot
+1000
+source :  a large church building with a massive clock tower
+target :  a church building with a tall narrow clock tower
+sampled :   a building building with a large lit lit tower
+2000
+source :  a kitchen filled with a wooden cabinet and a large window
+target :  picture of a kitchen with some plants and a window
+sampled :   kitchen with a dish and a ceiling over it
+3000
+source :  a red toilet in a very small bathroom
+target :  an old toilet painted red with a wooden lid
+sampled :   an orange mop sink with a red mop in the background
+4000
+source :  a jet liner flying above in the clear blue sky
+target :  an airliner as seen from the ground through some power lines
+sampled :   an airplane flies off the top of the sky surrounded by the ocean
+5000
+source :  a person adjusting a metal object hanging from a ceiling
+target :  a lady in a bath robe touching something near the ceiling
+sampled :   an artist doing a work work outside
+
+#quora: 
+source :  why are questions on quora so stupid
+target :  why are my questions on quora so stupid
+sampled :   news to be good good problems
+1000
+source :  will donald trump shut down the internet
+target :  if donald trump becomes president will we lose the internet
+sampled :   telephone ramirez you is named says i am the internet
+2000
+source :  what is the best feeling that you have ever had in your life
+target :  what was your best feeling in the world
+sampled :   i think the best in this world
+3000
+source :  what are logic gates
+target :  what is a logic gate
+sampled :   this is a nighttime place
+4000
+source :  can i increase my height after 20 how
+target :  is that possible to increase height after age 21 if possible how
+sampled :   there is how how how how this this this day
+5000
+source :  specifications wise which is the better console xbox one or playstation 4
+target :  what s the best gaming console xbox one or playstation 4
+sampled :   this man s best how how to play an electronic game
+------------------------------
+#################################################################
+
+MODEL: quora_coco_200kit_600_600: 
+
+## mscoco:
+source :  a black honda motorcycle parked in front of a garage
+target :  a honda motorcycle parked in a grass driveway
+sampled :   a motorcycle parked inside a parking lot
+1000
+source :  a large church building with a massive clock tower
+target :  a church building with a tall narrow clock tower
+sampled :   a clock tower with the large clock tower
+2000
+source :  a kitchen filled with a wooden cabinet and a large window
+target :  picture of a kitchen with some plants and a window
+sampled :   a kitchen with some appliances and a counter top
+3000
+source :  a red toilet in a very small bathroom
+target :  an old toilet painted red with a wooden lid
+sampled :   an open bathroom stall with a wooden toilet inside
+4000
+source :  a jet liner flying above in the clear blue sky
+target :  an airliner as seen from the ground through some power lines
+sampled :   an airplane is flying through the sky over a cloudy day
+5000
+source :  a person adjusting a metal object hanging from a ceiling
+target :  a lady in a bath robe touching something near the ceiling
+sampled :   a man in a suit adjusting his tie above the mirror
+
+## snli:
+source :  this church choir sings to the masses as they sing joyous songs from the book at a church
+target :  the church is filled with song
+sampled :   the church is decorated in christmas tree
+1000
+source :  a kneeling man bends his ear to listen on another in front of a guitar and audio equipment
+target :  two men are near audio equipment
+sampled :   two men are playing video games
+2000
+source :  a five piece horn band all playing in a hall of what looks like a church
+target :  there are people playing music
+sampled :   people on display outside together
+3000
+source :  uniformed group walks down a street
+target :  a group of people walk down the street
+sampled :   a group of people walking down the street
+
+# quora:
+source :  why are questions on quora so stupid
+target :  why are my questions on quora so stupid
+sampled :   why are some questions on quora so stupid
+1000
+source :  will donald trump shut down the internet
+target :  if donald trump becomes president will we lose the internet
+sampled :   will donald trump run his own his campaign proposals
+2000
+source :  what is the best feeling that you have ever had in your life
+target :  what was your best feeling in the world
+sampled :   what s the best feeling you in your life
+3000
+source :  what are logic gates
+target :  what is a logic gate
+sampled :   what is a logic <unk>
+4000
+source :  can i increase my height after 20 how
+target :  is that possible to increase height after age 21 if possible how
+sampled :   what do i do to increase my height after 21 years
+5000
+source :  specifications wise which is the better console xbox one or playstation 4
+target :  what s the best gaming console xbox one or playstation 4
+sampled :   which console is better xbox or xbox one or playstation 4
+------------------------------
+###############################################
+MODEL = mscoco_300kit_600_800
+
+## coco: 
+source :  a black honda motorcycle parked in front of a garage
+target :  a honda motorcycle parked in a grass driveway
+sampled :   a honda motorcycle parked in a yellow garage
+1000
+source :  a large church building with a massive clock tower
+target :  a church building with a tall narrow clock tower
+sampled :   outdoor large building a tall steeple on old building
+2000
+source :  a kitchen filled with a wooden cabinet and a large window
+target :  picture of a kitchen with some plants and a window
+sampled :   kitchen with a lot of cabinets and a few chairs
+3000
+source :  a red toilet in a very small bathroom
+target :  an old toilet painted red with a wooden lid
+sampled :   an old toilet blue bowl in a wood bathroom
+4000
+source :  a jet liner flying above in the clear blue sky
+target :  an airliner as seen from the ground through some power lines
+sampled :   an aircraft soaring for the sky over the edge of an arch
+5000
+source :  a person adjusting a metal object hanging from a ceiling
+target :  a lady in a bath robe touching something near the ceiling
+sampled :   a lady in a striped sweater stands over a counter shelf
+
+## quora:
+source :  why are questions on quora so stupid
+target :  why are my questions on quora so stupid
+sampled :   unable and you make your favorite atop this clock
+1000
+source :  will donald trump shut down the internet
+target :  if donald trump becomes president will we lose the internet
+sampled :   mp3 player surge their alarm will often want to enter
+2000
+source :  what is the best feeling that you have ever had in your life
+target :  what was your best feeling in the world
+sampled :   this girl is curious from the camera
+3000
+source :  what are logic gates
+target :  what is a logic gate
+sampled :   i is a pleasant tower in a field
+4000
+source :  can i increase my height after 20 how
+target :  is that possible to increase height after age 21 if possible how
+sampled :   that has to believe thin <unk> that re horses it through them
+5000
+source :  specifications wise which is the better console xbox one or playstation 4
+target :  what s the best gaming console xbox one or playstation 4
+sampled :   i s very flat screen tv has a wii system attached
+
+## snli: 
+source :  this church choir sings to the masses as they sing joyous songs from the book at a church
+target :  the church is filled with song
+sampled :   the four story s church
+1000
+source :  a kneeling man bends his ear to listen on another in front of a guitar and audio equipment
+target :  two men are near audio equipment
+sampled :   two men sitting at an wooden desk
+2000
+source :  a five piece horn band all playing in a hall of what looks like a church
+target :  there are people playing music
+sampled :   the crowd are standing there and having people a conversation
+3000
+source :  uniformed group walks down a street
+target :  a group of people walk down the street
+sampled :   a group of young people stand down a street side
+
+###################################################################
+MODEL = snli_quora_150k_600rnn
+
+## quora : 
+source :  why are questions on quora so stupid
+target :  why are my questions on quora so stupid
+sampled :   why are some questions on quora so stupid
+1000
+source :  will donald trump shut down the internet
+target :  if donald trump becomes president will we lose the internet
+sampled :   donald trump s election effect the election election will the end of the <unk>
+2000
+source :  what is the best feeling that you have ever had in your life
+target :  what was your best feeling in the world
+sampled :   what was the best moment in your life
+3000
+source :  what are logic gates
+target :  what is a logic gate
+sampled :   what is a logic function
+4000
+source :  can i increase my height after 20 how
+target :  is that possible to increase height after age 21 if possible how
+sampled :   is it possible to increase height after 21 how can i increase my height
+5000
+source :  specifications wise which is the better console xbox one or playstation 4
+target :  what s the best gaming console xbox one or playstation 4
+sampled :   what s the best gaming console xbox or xbox 4
+
+##snli: 
+source :  this church choir sings to the masses as they sing joyous songs from the book at a church
+target :  the church is filled with song
+sampled :   a group of people singing and singing a song
+1000
+source :  a kneeling man bends his ear to listen on another in front of a guitar and audio equipment
+target :  two men are near audio equipment
+sampled :   a man with glasses is playing guitar
+2000
+source :  a five piece horn band all playing in a hall of what looks like a church
+target :  there are people playing music
+sampled :   there are people in a church
+3000
+source :  uniformed group walks down a street
+target :  a group of people walk down the street
+sampled :   four people are walking down a street
+
+## coco: 
+source :  a black honda motorcycle parked in front of a garage
+target :  a honda motorcycle parked in a grass driveway
+sampled :   a motorcycle parked parked in the middle of a parked parked
+1000
+source :  a large church building with a massive clock tower
+target :  a church building with a tall narrow clock tower
+sampled :   a large building building with a big big york clock it it
+2000
+source :  a kitchen filled with a wooden cabinet and a large window
+target :  picture of a kitchen with some plants and a window
+sampled :   there is a box with a box and he is working on it
+3000
+source :  a red toilet in a very small bathroom
+target :  an old toilet painted red with a wooden lid
+sampled :   a big <unk> shower bed in a room
+4000
+source :  a jet liner flying above in the clear blue sky
+target :  an airliner as seen from the ground through some power lines
+sampled :   an airplane flies in the sky and the sky sky
+5000
+source :  a person adjusting a metal object hanging from a ceiling
+target :  a lady in a bath robe touching something near the ceiling
+sampled :   a person with a metal glass hangs on the roof
+
+####################################
+MODEL quora_coco_250k800_800
+
+## coco: 
+source :  a black honda motorcycle parked in front of a garage
+target :  a honda motorcycle parked in a grass driveway
+sampled :   a parked motorcycle near a city street
+1000
+source :  a large church building with a massive clock tower
+target :  a church building with a tall narrow clock tower
+sampled :   an old building a tall tower with roman clock
+2000
+source :  a kitchen filled with a wooden cabinet and a large window
+target :  picture of a kitchen with some plants and a window
+sampled :   view of a kitchen with some appliances and a window
+3000
+source :  a red toilet in a very small bathroom
+target :  an old toilet painted red with a wooden lid
+sampled :   an open toilet bowl with white tile floor
+4000
+source :  a jet liner flying above in the clear blue sky
+target :  an airliner as seen from the ground through some power lines
+sampled :   an airplane about to land in the air as a crowd of people
+5000
+source :  a person adjusting a metal object hanging from a ceiling
+target :  a lady in a bath robe touching something near the ceiling
+sampled :   a painting on a stainless steel wall with <unk> in a ceiling
+
+## quora: 
+source :  why are questions on quora so stupid
+target :  why are my questions on quora so stupid
+sampled :   why are so many questions on quora
+1000
+source :  will donald trump shut down the internet
+target :  if donald trump becomes president will we lose the internet
+sampled :   will donald trump actually lose his internet on the internet
+2000
+source :  what is the best feeling that you have ever had in your life
+target :  what was your best feeling in the world
+sampled :   what was the best feeling in your life
+3000
+source :  what are logic gates
+target :  what is a logic gate
+sampled :   what is logic gate
+4000
+source :  can i increase my height after 20 how
+target :  is that possible to increase height after age 21 if possible how
+sampled :   what are some ways to increase height after 21 years
+5000
+source :  specifications wise which is the better console xbox one or playstation 4
+target :  what s the best gaming console xbox one or playstation 4
+sampled :   which is better a xbox 4 or playstation 4 or xbox 4
+
+## snli: 
+
+source :  this church choir sings to the masses as they sing joyous songs from the book at a church
+target :  the church is filled with song
+sampled :   the building has a clock in it
+1000
+source :  a kneeling man bends his ear to listen on another in front of a guitar and audio equipment
+target :  two men are near audio equipment
+sampled :   young man and guitar posing around his guitar
+2000
+source :  a five piece horn band all playing in a hall of what looks like a church
+target :  there are people playing music
+sampled :   there are playing large kites
+3000
+source :  uniformed group walks down a street
+target :  a group of people walk down the street
+sampled :   two people are walking down the street
+
