@@ -33,7 +33,7 @@ def clean_str(string):
 
 
 class BatchLoader:
-    def __init__(self, vocab_size=25000, sentences=None, datasets={'quora'}, path=''):
+    def __init__(self, vocab_size=20000, sentences=None, datasets={'quora'}, path=''):
         '''
             Build vocab for sentences or for data files in path if None. 
         '''
@@ -130,15 +130,15 @@ class BatchLoader:
             else :
                 if file_name == 'quora_test': 
                     self.df_from_file = self.get_quora()[1]  
+
                 else:
                     if file_name == 'mscoco_test':
                         self.df_from_file = self.get_mscoco()[1]
                     else :
                         self.df_from_file = pd.read_csv(file_name)
+            self.df_from_file = self.df_from_file.iloc[:min(self.df_from_file.shape[0], 6000)]
 
             print('{} sentences loaded from {}.'.format(self.df_from_file.shape[0], file_name))
-
-            
             self.cur_file_point = 0
         
         # file ends
