@@ -264,7 +264,7 @@ class BatchLoader:
         self.data = [pd.DataFrame(), pd.DataFrame()]
 
         if 'quora' in self.datasets:
-            self.quora = [pd.read_csv(f)[['question1', 'question2']] for f in self.quora_data_files]
+            self.quora = self.get_quora()
             print('QUORA: train: {}, test: {}'.format(len(self.quora[0]), len(self.quora[1])))
             self.data = [d.append(q, ignore_index=True) for d,q in zip(self.data, self.quora)]
 
@@ -280,6 +280,9 @@ class BatchLoader:
         
         print('ALL: train: {}, test: {}'.format(len(self.data[0]), len(self.data[1])))
     
+    def get_quora(self):
+        return [pd.read_csv(f)[['question1', 'question2']] for f in self.quora_data_files]
+
     def get_mscoco(self):
         return [pd.read_csv(self.mscoco_path + 'train.csv'),
                 pd.read_csv(self.mscoco_path + 'valid.csv')]
