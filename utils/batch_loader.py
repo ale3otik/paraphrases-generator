@@ -125,7 +125,20 @@ class BatchLoader:
 
     def next_batch_from_file(self, batch_size, file_name, return_sentences=False):
         if self.df_from_file is None:
-            self.df_from_file = pd.read_csv(file_name)
+            if file_name == 'snli_test':
+                self.df_from_file = self.get_nli()[1]
+            else :
+                if file_name == 'quora_test': 
+                    self.df_from_file = self.get_quora()[1]  
+                else:
+                    if file_name == 'mscoco_test':
+                        self.df_from_file = self.get_mscoco()[1]
+                    else :
+                        self.df_from_file = pd.read_csv(file_name)
+
+            print('{} sentences loaded from {}.'.format(self.df_from_file.shape[0], file_name))
+
+            
             self.cur_file_point = 0
         
         # file ends

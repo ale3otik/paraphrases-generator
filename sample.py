@@ -18,8 +18,8 @@ if __name__ == "__main__":
                         help='use cuda (default: False)')
     parser.add_argument('--model-name', default='', metavar='MN',
                         help='name of model to save (default: "")')
-    parser.add_argument('--input-file', default='data/quora/test.csv', metavar='IF',
-                        help='name of file with input phrases (default: "data/quora/test.csv")')
+    parser.add_argument('--input-file', default='quora_test', metavar='IF',
+                        help='name of file with input phrases (default: "quora_test")')
     parser.add_argument('--output-file', default='out.txt', metavar='OF',
                     help='name of output file (default: "out.txt")')
     parser.add_argument('--use-mean', type=bool, default=False, metavar='UM',
@@ -80,11 +80,19 @@ if __name__ == "__main__":
             print('sampled : ', result[-1])
         i += 1
 
-    np.save('logs/sampled_out_{}{}.txt'.format(
-        'mean_' if args.use_mean else '', args.model_name), np.array(result))
-    np.save('logs/target_out_{}{}.txt'.format(
-        'mean_' if args.use_mean else '', args.model_name), np.array(target))
+    if args.input_file not in ['snli_test', 'mscoco_test', 'quora_test']:
+        args.input_file = 'custom_file'
+
+    sampled_file_dst = 'logs/sampled_out_{}_{}{}.txt'.format(args.input_file,
+                                            'mean_' if args.use_mean else '', args.model_name)
+    target_file_dst = 'logs/target_out_{}_{}{}.txt'.format(args.input_file,
+                                            'mean_' if args.use_mean else ''
+    np.save(sampled_file_dst, np.array(result))
+    np.save(target_file_dst, args.model_name), np.array(target))
     print('------------------------------')
+    print('results saved to: ')
+    print(sampled_file_dst)
+    print(target_file_dst)
     print('END')
 
 
