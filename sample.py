@@ -80,7 +80,7 @@ if __name__ == "__main__":
             print('sampled : ', result[-1])
         i += 1
 
-    if args.input_file not in ['snli_test', 'mscoco_test', 'quora_test']:
+    if args.input_file not in ['snli_test', 'mscoco_test', 'quora_test', 'snips']:
         args.input_file = 'custom_file'
 
     sampled_file_dst = 'logs/sampled_out_{}_{}{}.txt'.format(args.input_file,
