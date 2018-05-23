@@ -142,8 +142,8 @@ class BatchLoader:
 
             print('{} sentences loaded from {}.'.format(self.df_from_file.shape[0], file_name))
             sentences = list(self.df_from_file['question1']) + list(self.df_from_file['question2'])
-            word_dict = self.get_word_dict(sentences)
-            self.build_glove(word_dict)
+            # ADD new words to emb dict
+            self.build_input_vocab(sentences)
 
             self.cur_file_point = 0
         
@@ -301,9 +301,11 @@ class BatchLoader:
         for intent_id in range(len(intents_list)):
             X_intent = X[y == intent_id]
             for i in range(len(X_intent) - 1):
-                for j in range(1, len(X_intent)):
-                    pairs[0].append(X_intent[i])
-                    pairs[1].append(X_intent[j])
+                # RANDOM!
+                j = np.random.choice(list(range(i+1, len(X_intent))))
+                pairs[0].append(X_intent.iloc[i])
+                pairs[1].append(X_intent.iloc[j])
+
         result_df = pd.DataFrame(data=np.array(pairs).T, columns=['question1', 'question2'])
         return [], result_df
 
