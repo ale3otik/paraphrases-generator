@@ -299,7 +299,7 @@ class BatchLoader:
                              axis=1).idxmax(axis=1)], dtype=np.int32)
         pairs = [[],[]]
         for intent_id in range(len(intents_list)):
-            X_intent = snips_df[y == intent_id]
+            X_intent = X[y == intent_id]
             for i in range(len(X_intent) - 1):
                 for j in range(1, len(X_intent)):
                     pairs[0].append(X_intent[i])
