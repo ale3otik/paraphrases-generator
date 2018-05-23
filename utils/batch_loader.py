@@ -125,11 +125,12 @@ class BatchLoader:
 
     def next_batch_from_file(self, batch_size, file_name, return_sentences=False):
         if self.df_from_file is None:
-            predefined_datasets = 
-            {'snli_test': self.get_nli , 
-             'quora_test': self.get_quora, 
-             'mscoco_test': self.get_mscoco,
-             'snips': self.get_snips}
+            predefined_datasets = {
+                'snli_test': self.get_nli , 
+                'quora_test': self.get_quora, 
+                'mscoco_test': self.get_mscoco,
+                'snips': self.get_snips
+            }
 
             if file_name in predefined_datasets.keys():
                 self.df_from_file = predefined_datasets[file_name]()[1]
@@ -140,6 +141,10 @@ class BatchLoader:
                 min(self.df_from_file.shape[0], 6000), replace=False)
 
             print('{} sentences loaded from {}.'.format(self.df_from_file.shape[0], file_name))
+            sentences = list(self.df_from_file['question1']) + list(self.df_from_file['question2'])
+            word_dict = self.get_word_dict(sentences)
+            self.build_glove(word_dict)
+
             self.cur_file_point = 0
         
         # file ends
