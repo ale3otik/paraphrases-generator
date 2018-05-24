@@ -129,6 +129,7 @@ class BatchLoader:
             or self.sampling_file_name != file_name \
             or self.df_from_file is None:
 
+            self.sampling_file_name = file_name
             self.cur_file_point = 0
 
             predefined_datasets = {

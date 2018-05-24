@@ -148,7 +148,8 @@ if __name__ == "__main__":
                 args.seq_len = 30
                 
                 for sample_file in SAMPLE_FILES:
-                    result, target = sample_with_input_file(batch_loader, paraphraser, args, sample_file):
+                    result, target = sample.sample_with_input_file(batch_loader,
+                                                paraphraser, args, sample_file)
 
                     sampled_file_dst = 'logs/intermediate/sampled_out_{}k_{}{}.txt'.format(
                                                 iteration//1000, args.input_file, args.model_name)

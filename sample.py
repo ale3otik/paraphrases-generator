@@ -79,7 +79,7 @@ if __name__ == "__main__":
     if args.use_cuda:
         paraphraser = paraphraser.cuda()
 
-    result, target = sample_with_input_file(batch_loader, paraphraser, args, args.input_file):
+    result, target = sample_with_input_file(batch_loader, paraphraser, args, args.input_file)
 
     if args.input_file not in ['snli_test', 'mscoco_test', 'quora_test', 'snips']:
         args.input_file = 'custom_file'
