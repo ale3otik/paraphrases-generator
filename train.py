@@ -152,9 +152,9 @@ if __name__ == "__main__":
                                                 paraphraser, args, sample_file)
 
                     sampled_file_dst = 'logs/intermediate/sampled_out_{}k_{}{}.txt'.format(
-                                                iteration//1000, args.input_file, args.model_name)
+                                                iteration//1000, sample_file, args.model_name)
                     target_file_dst = 'logs/intermediate/target_out_{}k_{}{}.txt'.format(
-                                                iteration//1000, args.input_file, args.model_name)    
+                                                iteration//1000, sample_file, args.model_name)    
                     np.save(sampled_file_dst, np.array(result))
                     np.save(target_file_dst, np.array(target))
                     print('------------------------------')
