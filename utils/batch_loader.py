@@ -48,6 +48,7 @@ class BatchLoader:
         self.go_label = '<s>'
 
         self.df_from_file = None
+        self.sampling_file_name = None
         self.datasets = datasets
         self.quora_data_files = [path + 'data/quora/train.csv', path + 'data/quora/test.csv']
         self.snli_path = '../InferSent/dataset/SNLI/'
@@ -124,7 +125,12 @@ class BatchLoader:
             return input
 
     def next_batch_from_file(self, batch_size, file_name, return_sentences=False):
-        if self.df_from_file is None:
+        if self.sampling_file_name is None \
+            or self.sampling_file_name != file_name \
+            or self.df_from_file is None:
+
+            self.cur_file_point = 0
+
             predefined_datasets = {
                 'snli_test': self.get_nli , 
                 'quora_test': self.get_quora, 
@@ -144,8 +150,6 @@ class BatchLoader:
             sentences = list(self.df_from_file['question1']) + list(self.df_from_file['question2'])
             # ADD new words to emb dict
             self.build_input_vocab(sentences)
-
-            self.cur_file_point = 0
         
         # file ends
         if self.cur_file_point == len(self.df_from_file):

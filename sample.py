@@ -9,6 +9,32 @@ from utils.batch_loader import BatchLoader
 from model.parameters import Parameters
 from model.paraphraser import Paraphraser
 
+def sample_with_input_file(batch_loader, paraphraser, args, input_file):
+    result, target, i = [], [] , 0
+    while True:
+        next_batch = batch_loader.next_batch_from_file(batch_size=1,
+         file_name=input_file, return_sentences=True)
+        
+        if next_batch is None:
+            break
+
+        input, sentences = next_batch
+        input = [var.cuda() if args.use_cuda else var for var in input]
+
+        result += [paraphraser.sample_with_input(batch_loader,
+                                 args.seq_len, 
+                                 args.use_cuda,
+                                 args.use_mean,
+                                input)]
+        target += [sentences[1][0]]
+        if i % 1000 == 0:
+            print(i)
+            print('source : ', ' '.join(sentences[0][0]))
+            print('target : ', ' '.join(sentences[1][0]))
+            print('sampled : ', result[-1])
+        i += 1
+    return result, target
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Paraphraser')
@@ -53,32 +79,7 @@ if __name__ == "__main__":
     if args.use_cuda:
         paraphraser = paraphraser.cuda()
 
-    result = []
-    target = []
-
-    i = 0
-    while True:
-        next_batch = batch_loader.next_batch_from_file(batch_size=1,
-         file_name=args.input_file, return_sentences=True)
-        
-        if next_batch is None:
-            break
-
-        input, sentences = next_batch
-        input = [var.cuda() if args.use_cuda else var for var in input]
-
-        result += [paraphraser.sample_with_input(batch_loader,
-                                 args.seq_len, 
-                                 args.use_cuda,
-                                 args.use_mean,
-                                input)]
-        target += [sentences[1][0]]
-        if i % 1000 == 0:
-            print(i)
-            print('source : ', ' '.join(sentences[0][0]))
-            print('target : ', ' '.join(sentences[1][0]))
-            print('sampled : ', result[-1])
-        i += 1
+    result, target = sample_with_input_file(batch_loader, paraphraser, args, args.input_file):
 
     if args.input_file not in ['snli_test', 'mscoco_test', 'quora_test', 'snips']:
         args.input_file = 'custom_file'

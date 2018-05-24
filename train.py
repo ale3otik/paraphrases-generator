@@ -5,6 +5,7 @@ import numpy as np
 import torch as t
 from torch.optim import Adam
 
+import sample 
 from utils.batch_loader import BatchLoader
 from model.parameters import Parameters
 from model.paraphraser import Paraphraser
@@ -34,6 +35,8 @@ if __name__ == "__main__":
                     help='if include snli dataset (default: False)')
     parser.add_argument('--use-coco', default=False, type=bool, metavar='coco', 
                     help='if include mscoco dataset (default: False)')
+    parser.add_argument('--interm-sampling', default=False, type=bool, metavar='IS', 
+                    help='if sample while training (default: False)')
 
     args = parser.parse_args()
     
@@ -130,10 +133,31 @@ if __name__ == "__main__":
                 print('...........................')
 
         # save model
-        if (iteration % 1000 == 0 and iteration != 0) or iteration == (args.num_iterations - 1):
+        if (iteration % 10000 == 0 and iteration != 0) or iteration == (args.num_iterations - 1):
             t.save(paraphraser.state_dict(), 'saved_models/trained_paraphraser_' + args.model_name)
             np.save('logs/ce_result_valid_{}.npy'.format(args.model_name), np.array(ce_result_valid))
             np.save('logs/kld_result_valid_{}'.format(args.model_name), np.array(kld_result_valid))
             np.save('logs/ce_result_train_{}.npy'.format(args.model_name), np.array(ce_result_train))
             np.save('logs/kld_result_train_{}'.format(args.model_name), np.array(kld_result_train))
+
+        #interm sampling
+        if (iteration % 20000 == 0 and iteration != 0) or iteration == (args.num_iterations - 1):
+            if args.interm_sampling:
+                SAMPLE_FILES = ['snli_test', 'mscoco_test', 'quora_test', 'snips']
+                args.use_mean = False
+                args.seq_len = 30
+                
+                for sample_file in SAMPLE_FILES:
+                    result, target = sample_with_input_file(batch_loader, paraphraser, args, sample_file):
+
+                    sampled_file_dst = 'logs/intermediate/sampled_out_{}k_{}{}.txt'.format(
+                                                iteration//1000, args.input_file, args.model_name)
+                    target_file_dst = 'logs/intermediate/target_out_{}k_{}{}.txt'.format(
+                                                iteration//1000, args.input_file, args.model_name)    
+                    np.save(sampled_file_dst, np.array(result))
+                    np.save(target_file_dst, np.array(target))
+                    print('------------------------------')
+                    print('results saved to: ')
+                    print(sampled_file_dst)
+                    print(target_file_dst)
             
