@@ -10,7 +10,7 @@ from model.parameters import Parameters
 from model.paraphraser import Paraphraser
 
 def sample_with_input_file(batch_loader, paraphraser, args, input_file):
-    result, target, i = [], [] , 0
+    result, target, source, i = [], [] , [],  0
     while True:
         next_batch = batch_loader.next_batch_from_file(batch_size=1,
          file_name=input_file, return_sentences=True)
@@ -27,13 +27,14 @@ def sample_with_input_file(batch_loader, paraphraser, args, input_file):
                                  args.use_mean,
                                 input)]
         target += [sentences[1][0]]
+        source += [sentences[0][0]]
         if i % 1000 == 0:
             print(i)
             print('source : ', ' '.join(sentences[0][0]))
             print('target : ', ' '.join(sentences[1][0]))
             print('sampled : ', result[-1])
         i += 1
-    return result, target
+    return result, target, source
 
 if __name__ == "__main__":
 
@@ -79,7 +80,7 @@ if __name__ == "__main__":
     if args.use_cuda:
         paraphraser = paraphraser.cuda()
 
-    result, target = sample_with_input_file(batch_loader, paraphraser, args, args.input_file)
+    result, target, source = sample_with_input_file(batch_loader, paraphraser, args, args.input_file)
 
     if args.input_file not in ['snli_test', 'mscoco_test', 'quora_test', 'snips']:
         args.input_file = 'custom_file'
@@ -88,12 +89,18 @@ if __name__ == "__main__":
                                             'mean_' if args.use_mean else '', args.model_name)
     target_file_dst = 'logs/target_out_{}_{}{}.txt'.format(args.input_file,
                                             'mean_' if args.use_mean else '', args.model_name)
+    source_file_dst = 'logs/source_out_{}_{}{}.txt'.format(args.input_file,
+                                            'mean_' if args.use_mean else '', args.model_name)
+
     np.save(sampled_file_dst, np.array(result))
     np.save(target_file_dst, np.array(target))
+    np.save(source_file_dst, np.array(source))
+
     print('------------------------------')
     print('results saved to: ')
     print(sampled_file_dst)
     print(target_file_dst)
+    print(source_file_dst)
     print('END')
 
 

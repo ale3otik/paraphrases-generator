@@ -148,17 +148,21 @@ if __name__ == "__main__":
                 args.seq_len = 30
                 
                 for sample_file in SAMPLE_FILES:
-                    result, target = sample.sample_with_input_file(batch_loader,
+                    result, target, source = sample.sample_with_input_file(batch_loader,
                                                 paraphraser, args, sample_file)
 
                     sampled_file_dst = 'logs/intermediate/sampled_out_{}k_{}{}.txt'.format(
                                                 iteration//1000, sample_file, args.model_name)
                     target_file_dst = 'logs/intermediate/target_out_{}k_{}{}.txt'.format(
                                                 iteration//1000, sample_file, args.model_name)    
+                    source_file_dst = 'logs/intermediate/source_out_{}k_{}{}.txt'.format(
+                                                iteration//1000, sample_file, args.model_name)    
                     np.save(sampled_file_dst, np.array(result))
                     np.save(target_file_dst, np.array(target))
+                    np.save(source_file_dst, np.array(source))
                     print('------------------------------')
                     print('results saved to: ')
                     print(sampled_file_dst)
                     print(target_file_dst)
+                    print(source_file_dst)
             
